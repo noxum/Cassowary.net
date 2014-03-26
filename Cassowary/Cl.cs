@@ -30,48 +30,19 @@ namespace Cassowary
 	/// </summary>
 	public class Cl
 	{
-		protected static bool _debug = false;
-		protected static bool _trace = false;
-		protected static bool _gc = false;
-
-		protected static void DebugPrint(string s)
-		{
-			Console.Error.WriteLine(s);
-		}
-
-		protected static void TracePrint(string s)
-		{
-			Console.Error.WriteLine(s);
-		}
-
-		protected static void FnEnterPrint(string s)
-		{
-			Console.Error.WriteLine("* {0}", s);
-		}
-		
-		protected static void FnExitPrint(string s)
-		{
-			Console.Error.WriteLine("- {0}", s);
-		}
-		
-		protected void Assert(bool f, string description)
+		protected static void Assert(bool f, string description)
 		{
 			if (!f) 
 			{
-				throw new ExClInternalError(string.Format("Assertion failed: {0}", description));
+				throw new CassowaryInternalException(string.Format("Assertion failed: {0}", description));
 			}
 		}
 
-		protected void Assert(bool f)
-		{
-		  if (!f) 
-			{
-			  throw new ExClInternalError("Assertion failed");
-			}
-		}
-
-	  public const byte GEQ = 1;
-	  public const byte LEQ = 2;
+	    public enum Operator : byte
+	    {
+	        GreaterThanOrEqualTo = 1,
+	        LessThanOrEqualTo = 2
+	    }
 
 		public static ClLinearExpression Plus(ClLinearExpression e1, ClLinearExpression e2)
 		{
@@ -168,9 +139,9 @@ namespace Cassowary
 
 		public static bool Approx(double a, double b)
 		{
-			double epsilon = 1.0e-8;
-			
-			if (a == 0.0) 
+		    const double epsilon = 1.0e-8;
+
+		    if (a == 0.0) 
 			{
 			  return (Math.Abs(b) < epsilon);
 			} 
@@ -184,7 +155,7 @@ namespace Cassowary
 			}
 		}
 
-		public static bool Approx(ClVariable clv, double b)
+	    public static bool Approx(ClVariable clv, double b)
 		{
 		  return Approx(clv.Value, b);
 		}
@@ -208,7 +179,7 @@ namespace Cassowary
 		      result += ", ";
 		    }
 		    
-		    result += k.ToString() + " => " + h[k].ToString();
+		    result += k + " => " + h[k];
 		  }
 		  
 		  result += "}";
@@ -235,23 +206,5 @@ namespace Cassowary
 		  result += "}";
 		  return result;
 		}
-
-    public static bool Debug 
-    {
-      get { return _debug; }
-      set { _debug = value; }
-    }
-
-    public static bool Trace 
-    {
-      get { return _trace; }
-      set { _trace = value; }
-    }
-
-    public static bool GC 
-    {
-      get { return _gc; }
-      set { _gc = value; }
-    }
 	}
 }

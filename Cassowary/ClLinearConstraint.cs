@@ -19,21 +19,16 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-using System;
-
 namespace Cassowary
 {
   public class ClLinearConstraint : ClConstraint
   {
-    public ClLinearConstraint(ClLinearExpression cle,
-                              ClStrength strength, 
-                              double weight) : base(strength, weight)
+    public ClLinearConstraint(ClLinearExpression cle, ClStrength strength, double weight) : base(strength, weight)
     {
       _expression = cle;
     }
 
-    public ClLinearConstraint(ClLinearExpression cle,
-                              ClStrength strength) : base(strength, 1.0)
+    public ClLinearConstraint(ClLinearExpression cle, ClStrength strength) : base(strength, 1.0)
     {       
       _expression = cle;
     }

@@ -19,22 +19,13 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-using System;
-
 namespace Cassowary
 {
-  public class ExClInternalError : ExClError
-  {
-    public ExClInternalError(string s) 
+    public class CassowaryNonlinearExpressionException : CassowaryException
     {
-      description_ = s;
+        public CassowaryNonlinearExpressionException()
+            : base("(ExClNonlinearExpression) The resulting expression would be nonlinear")
+        {
+        }
     }
-
-    public override string Description()
-    { 
-      return string.Format("(ExClInternalError) ", description_);
-    }
-
-    private String description_;
-  }
 }

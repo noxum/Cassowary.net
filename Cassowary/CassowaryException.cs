@@ -23,16 +23,17 @@ using System;
 
 namespace Cassowary
 {
-  public class ExClError : Exception
+  public class CassowaryException : Exception
   {
-    public virtual string Description()
-    { 
-      return "(ExClError) An error has occured in CL";
-    }
+      public CassowaryException()
+          : base("(ExClError) An error has occured in CL")
+      {
+      }
 
-    public override string ToString()
-    {
-      return Description();
-    }
+      public CassowaryException(string message)
+          : base(message)
+      {
+          
+      }
   }
 }

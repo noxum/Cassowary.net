@@ -131,9 +131,9 @@ public ClConstraint Value
 		if (eq)
 		 Value = new ClLinearEquation(e1, e2);
 		else if (geq)
-		  Value = new ClLinearInequality(e1, Cl.GEQ, e2);
+		  Value = new ClLinearInequality(e1, Cl.Operator.GreaterThanOrEqualTo, e2);
 		else if (leq)
-		  Value = new ClLinearInequality(e1, Cl.LEQ, e2);
+		  Value = new ClLinearInequality(e1, Cl.Operator.LessThanOrEqualTo, e2);
 		
 	}
 

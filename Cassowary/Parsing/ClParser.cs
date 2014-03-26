@@ -23,9 +23,6 @@ using System.IO;
 using System.Text;
 using System.Collections;
 
-using Cassowary;
-using Cassowary.Parsing;
-
 namespace Cassowary.Parsing
 {
   public class ClParser

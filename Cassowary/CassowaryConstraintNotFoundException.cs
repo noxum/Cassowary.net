@@ -19,15 +19,13 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-using System;
-
 namespace Cassowary
 {
-  public class ExClNotEnoughStays : ExClError
-  {
-    public override string Description()
-    { 
-      return "(ExCLNotEnoughStays) There are not enough stays to give specific values to every variable";
+    public class CassowaryConstraintNotFoundException : CassowaryException
+    {
+        public CassowaryConstraintNotFoundException()
+            : base("(ExCLConstraintNotFound) Tried to remove a constraint never added to the tableau")
+        {
+        }
     }
-  }
 }

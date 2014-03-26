@@ -1,0 +1,15 @@
+*.suo
+*.user
+*.cachefile
+*.sln.docstates
+*.cache
+_Resharper.*
+_NCrunch*
+*.DotSettings
+*.ncrunchproject
+*.ncrunchsolution
+*.vsmdi
+*.testsettings
+
+obj
+bin

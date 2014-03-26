@@ -19,15 +19,13 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-using System;
-
 namespace Cassowary
 {
-  public class ExClConstraintNotFound : ExClError
-  {
-    public override string Description()
-    { 
-      return "(ExCLConstraintNotFound) Tried to remove a constraint never added to the tableau"; 
+    public class CassowaryRequiredFailureException : CassowaryException
+    {
+        public CassowaryRequiredFailureException()
+            : base("(ExCLRequiredFailure) A required constraint cannot be satisfied")
+        {
+        }
     }
-  }
 }

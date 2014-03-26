@@ -19,15 +19,13 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-using System;
-
 namespace Cassowary
 {
-  public class ExClRequiredFailure : ExClError
-  {
-    public override string Description()
-    { 
-      return "(ExCLRequiredFailure) A required constraint cannot be satisfied";
+    public class CassowaryTooDifficultException : CassowaryException
+    {
+        public CassowaryTooDifficultException()
+            : base("(ExCLTooDifficult) The constraints are too difficult to solve")
+        {
+        }
     }
-  }
 }

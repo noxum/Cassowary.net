@@ -19,15 +19,13 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-using System;
-
 namespace Cassowary
 {
-  public class ExClTooDifficult : ExClError
-  {
-    public override string Description()
-    { 
-      return "(ExCLTooDifficult) The constraints are too difficult to solve"; 
+    public class CassowaryNotEnoughStaysException : CassowaryException
+    {
+        public CassowaryNotEnoughStaysException()
+            : base("(ExCLNotEnoughStays) There are not enough stays to give specific values to every variable")
+        {
+        }
     }
-  }
 }
