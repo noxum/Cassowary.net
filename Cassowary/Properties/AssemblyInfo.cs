@@ -1,4 +1,4 @@
-/*
+ï»¿/*
   Cassowary.net: an incremental constraint solver for .NET
   (http://lumumba.uhasselt.be/jo/projects/cassowary.net/)
   
@@ -19,22 +19,19 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-using System;
-
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 //
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
-[assembly: AssemblyTitle("Cassowary.Parsing-cf")]
-[assembly: AssemblyDescription("Cassowary.net parsing support library (CF version)")]
+[assembly: AssemblyTitle("Cassowary")]
+[assembly: AssemblyDescription("Cassowary.net core library")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Cassowary.net")]
-[assembly: AssemblyCopyright("Copyright © 2005-2007  Jo Vermeulen (jo.vermeulen@uhasselt.be)")]
+[assembly: AssemblyCopyright("Copyright 2005-2007  Jo Vermeulen (jo.vermeulen@uhasselt.be)")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -49,5 +46,5 @@ using System.Runtime.CompilerServices;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("0.2.3.*")]
+[assembly: AssemblyVersion("1.0.0")]
 
