@@ -22,6 +22,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Cassowary
 {
@@ -65,11 +66,8 @@ namespace Cassowary
         {
             _constant.Value = _constant.Value * x;
 
-            foreach (ClAbstractVariable clv in _terms.Keys)
-            {
-                ClDouble cld = _terms[clv];
+            foreach (ClDouble cld in _terms.Keys.Select(a => _terms[a]))
                 cld.Value = cld.Value * x;
-            }
 
             return this;
         }
@@ -288,15 +286,10 @@ namespace Cassowary
                 throw new CassowaryInternalException("anyPivotableVariable called on a constant");
             }
 
-            foreach (ClAbstractVariable clv in _terms.Keys)
-            {
-                if (clv.IsPivotable)
-                    return clv;
-            }
+            return _terms.Keys.FirstOrDefault(a => a.IsPivotable);
 
             // No pivotable variables, so just return null, and let the caller
             // error if needed
-            return null;
         }
 
         /// <summary>

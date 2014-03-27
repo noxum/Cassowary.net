@@ -20,191 +20,147 @@
 */
 
 using System;
-using System.Collections;
 
 namespace Cassowary
 {
-	/// <summary>
-	/// The enumerations from ClLinearInequality,
-	/// and `global' functions that we want easy to access
-	/// </summary>
-	public class Cl
-	{
-		protected static void Assert(bool f, string description)
-		{
-			if (!f) 
-			{
-				throw new CassowaryInternalException(string.Format("Assertion failed: {0}", description));
-			}
-		}
+    /// <summary>
+    /// The enumerations from ClLinearInequality,
+    /// and `global' functions that we want easy to access
+    /// </summary>
+    public class Cl
+    {
+        protected static void Assert(bool f, string description)
+        {
+            if (!f)
+            {
+                throw new CassowaryInternalException(string.Format("Assertion failed: {0}", description));
+            }
+        }
 
-	    public enum Operator : byte
-	    {
-	        GreaterThanOrEqualTo = 1,
-	        LessThanOrEqualTo = 2
-	    }
+        public enum Operator : byte
+        {
+            GreaterThanOrEqualTo = 1,
+            LessThanOrEqualTo = 2
+        }
 
-		public static ClLinearExpression Plus(ClLinearExpression e1, ClLinearExpression e2)
-		{
-		  return e1.Plus(e2);
-		}
+        public static ClLinearExpression Plus(ClLinearExpression e1, ClLinearExpression e2)
+        {
+            return e1.Plus(e2);
+        }
 
-		public static ClLinearExpression Plus(double e1, ClLinearExpression e2)
-		{
-		  return (new ClLinearExpression(e1)).Plus(e2);
-		}
+        public static ClLinearExpression Plus(double e1, ClLinearExpression e2)
+        {
+            return (new ClLinearExpression(e1)).Plus(e2);
+        }
 
-		public static ClLinearExpression Plus(ClVariable e1, ClLinearExpression e2)
-		{
-		  return (new ClLinearExpression(e1)).Plus(e2);
-		}
+        public static ClLinearExpression Plus(ClVariable e1, ClLinearExpression e2)
+        {
+            return (new ClLinearExpression(e1)).Plus(e2);
+        }
 
-		public static ClLinearExpression Plus(ClLinearExpression e1, ClVariable e2)
-		{
-		  return e1.Plus(new ClLinearExpression(e2));
-		}
+        public static ClLinearExpression Plus(ClLinearExpression e1, ClVariable e2)
+        {
+            return e1.Plus(new ClLinearExpression(e2));
+        }
 
-		public static ClLinearExpression Plus(ClVariable e1, double e2)
-		{
-		  return (new ClLinearExpression(e1)).Plus(new ClLinearExpression(e2));
-		}
+        public static ClLinearExpression Plus(ClVariable e1, double e2)
+        {
+            return (new ClLinearExpression(e1)).Plus(new ClLinearExpression(e2));
+        }
 
-		public static ClLinearExpression Plus(double e1, ClVariable e2)
-		{
-		  return (new ClLinearExpression(e1)).Plus(new ClLinearExpression(e2));
-		}
+        public static ClLinearExpression Plus(double e1, ClVariable e2)
+        {
+            return (new ClLinearExpression(e1)).Plus(new ClLinearExpression(e2));
+        }
 
-		public static ClLinearExpression Minus(ClLinearExpression e1, ClLinearExpression e2)
-		{ 
-			return e1.Minus(e2); 
-		}
+        public static ClLinearExpression Minus(ClLinearExpression e1, ClLinearExpression e2)
+        {
+            return e1.Minus(e2);
+        }
 
-		public static ClLinearExpression Minus(double e1, ClLinearExpression e2)
-		{ 
-			return (new ClLinearExpression(e1)).Minus(e2); 
-		}
+        public static ClLinearExpression Minus(double e1, ClLinearExpression e2)
+        {
+            return (new ClLinearExpression(e1)).Minus(e2);
+        }
 
-		public static ClLinearExpression Minus(ClLinearExpression e1, double e2)
-		{ 
-			return e1.Minus(new ClLinearExpression(e2)); 
-		}
+        public static ClLinearExpression Minus(ClLinearExpression e1, double e2)
+        {
+            return e1.Minus(new ClLinearExpression(e2));
+        }
 
-		public static ClLinearExpression Times(ClLinearExpression e1, ClLinearExpression e2) 
-		  /*throws ExCLNonlinearExpression*/
-		{ 
-			return e1.Times(e2); 
-		}
+        public static ClLinearExpression Times(ClLinearExpression e1, ClLinearExpression e2)
+            /*throws ExCLNonlinearExpression*/
+        {
+            return e1.Times(e2);
+        }
 
-		public static ClLinearExpression Times(ClLinearExpression e1, ClVariable e2) 
-		  /*throws ExCLNonlinearExpression*/
-		{ 
-			return e1.Times(new ClLinearExpression(e2)); 
-		}
+        public static ClLinearExpression Times(ClLinearExpression e1, ClVariable e2)
+            /*throws ExCLNonlinearExpression*/
+        {
+            return e1.Times(new ClLinearExpression(e2));
+        }
 
-		public static ClLinearExpression Times(ClVariable e1, ClLinearExpression e2) 
-		  /*throws ExCLNonlinearExpression*/
-		{ 
-			return (new ClLinearExpression(e1)).Times(e2); 
-		}
+        public static ClLinearExpression Times(ClVariable e1, ClLinearExpression e2)
+            /*throws ExCLNonlinearExpression*/
+        {
+            return (new ClLinearExpression(e1)).Times(e2);
+        }
 
-		public static ClLinearExpression Times(ClLinearExpression e1, double e2) 
-		  /*throws ExCLNonlinearExpression*/
-		{		
-			return e1.Times(new ClLinearExpression(e2)); 
-		}
+        public static ClLinearExpression Times(ClLinearExpression e1, double e2)
+            /*throws ExCLNonlinearExpression*/
+        {
+            return e1.Times(new ClLinearExpression(e2));
+        }
 
-		public static ClLinearExpression Times(double e1, ClLinearExpression e2) 
-		  /*throws ExCLNonlinearExpression*/
-		{ 
-			return (new ClLinearExpression(e1)).Times(e2); 
-		}
+        public static ClLinearExpression Times(double e1, ClLinearExpression e2)
+            /*throws ExCLNonlinearExpression*/
+        {
+            return (new ClLinearExpression(e1)).Times(e2);
+        }
 
-		public static ClLinearExpression Times(double n, ClVariable clv) 
-		  /*throws ExCLNonlinearExpression*/
-		{ 
-			return new ClLinearExpression(clv,n); 
-		}
+        public static ClLinearExpression Times(double n, ClVariable clv)
+            /*throws ExCLNonlinearExpression*/
+        {
+            return new ClLinearExpression(clv, n);
+        }
 
-		public static ClLinearExpression Times( ClVariable clv, double n) 
-		  /*throws ExCLNonlinearExpression*/
-		{ 
-			return new ClLinearExpression(clv,n); 
-		}
+        public static ClLinearExpression Times(ClVariable clv, double n)
+            /*throws ExCLNonlinearExpression*/
+        {
+            return new ClLinearExpression(clv, n);
+        }
 
-		public static ClLinearExpression Divide(ClLinearExpression e1, ClLinearExpression e2) 
-		  /*throws ExCLNonlinearExpression*/
-		{
-			return e1.Divide(e2); 
-		}
+        public static ClLinearExpression Divide(ClLinearExpression e1, ClLinearExpression e2)
+            /*throws ExCLNonlinearExpression*/
+        {
+            return e1.Divide(e2);
+        }
 
-		public static bool Approx(double a, double b)
-		{
-		    const double epsilon = 1.0e-8;
+        public static bool Approx(double a, double b)
+        {
+            const double epsilon = 1.0e-8;
 
-		    if (a == 0.0) 
-			{
-			  return (Math.Abs(b) < epsilon);
-			} 
-			else if (b == 0.0) 
-			{
-			  return (Math.Abs(a) < epsilon);
-			} 
-			else 
-			{
-			  return (Math.Abs(a-b) < Math.Abs(a) * epsilon);
-			}
-		}
+            // ReSharper disable CompareOfFloatsByEqualityOperator
+            if (a == 0.0)
+                // ReSharper restore CompareOfFloatsByEqualityOperator
+            {
+                return (Math.Abs(b) < epsilon);
+            }
+                // ReSharper disable CompareOfFloatsByEqualityOperator
+            else if (b == 0.0)
+                // ReSharper restore CompareOfFloatsByEqualityOperator
+            {
+                return (Math.Abs(a) < epsilon);
+            }
+            else
+            {
+                return (Math.Abs(a - b) < Math.Abs(a) * epsilon);
+            }
+        }
 
-	    public static bool Approx(ClVariable clv, double b)
-		{
-		  return Approx(clv.Value, b);
-		}
-
-		static bool Approx(double a, ClVariable clv)
-		{
-		  return Approx(a, clv.Value);
-		}
-
-		public static string HashtableToString(Hashtable h)
-		{
-		  string result = "{";
-		  
-		  bool first = true;
-		  foreach (object k in h.Keys)
-		  {
-		    if (first)
-		      first = false;
-		    else
-		    {
-		      result += ", ";
-		    }
-		    
-		    result += k + " => " + h[k];
-		  }
-		  
-		  result += "}";
-		  return result;
-		}
-
-		public static string ArrayListToString(ArrayList a)
-		{
-		  string result = "{";
-		  
-		  bool first = true;
-		  foreach (object o in a)
-		  {
-		    if (first)
-		      first = false;
-		    else
-		    {
-		      result += ", ";
-	      }
-		      
-		    result += o.ToString();
-		  }
-		  
-		  result += "}";
-		  return result;
-		}
-	}
+        public static bool Approx(ClVariable clv, double b)
+        {
+            return Approx(clv.Value, b);
+        }
+    }
 }

@@ -42,22 +42,30 @@ namespace Cassowary
         }
         #endregion
 
-        private static IEnumerable<ClConstraint> FromExpression(Dictionary<string, ClAbstractVariable> variables, Expression expression, ClStrength strength)
+        private static IEnumerable<ClConstraint> FromExpression(IDictionary<string, ClAbstractVariable> variables, Expression expression, ClStrength strength)
         {
-            if (expression.NodeType == ExpressionType.And || expression.NodeType == ExpressionType.AndAlso)
+            switch (expression.NodeType)
             {
-                foreach (var c in FromExpression(variables, ((BinaryExpression)expression).Left, strength))
-                    yield return c;
-                foreach (var c in FromExpression(variables, ((BinaryExpression)expression).Right, strength))
-                    yield return c;
-            }
-            else if (expression.NodeType == ExpressionType.Equal)
-            {
-                yield return CreateEquality(variables, (BinaryExpression)expression, strength);
-            }
-            else if (expression.NodeType == ExpressionType.GreaterThanOrEqual || expression.NodeType == ExpressionType.LessThanOrEqual)
-            {
-                yield return CreateLinearInequality(variables, (BinaryExpression)expression, strength);
+                case ExpressionType.AndAlso:
+                case ExpressionType.And:
+                {
+                    foreach (var c in FromExpression(variables, ((BinaryExpression) expression).Left, strength))
+                        yield return c;
+                    foreach (var c in FromExpression(variables, ((BinaryExpression) expression).Right, strength))
+                        yield return c;
+                    break;
+                }
+                case ExpressionType.Equal:
+                {
+                    yield return CreateEquality(variables, (BinaryExpression) expression, strength);
+                    break;
+                }
+                case ExpressionType.LessThanOrEqual:
+                case ExpressionType.GreaterThanOrEqual:
+                {
+                    yield return CreateLinearInequality(variables, (BinaryExpression) expression, strength);
+                    break;
+                }
             }
         }
 
@@ -99,7 +107,7 @@ namespace Cassowary
             return new ClLinearEquation(CreateLinearExpression(variables, expression.Left), CreateLinearExpression(variables, expression.Right), strength);
         }
 
-        private static ClLinearInequality CreateLinearInequality(Dictionary<string, ClAbstractVariable> variables, BinaryExpression expression, ClStrength strength)
+        private static ClLinearInequality CreateLinearInequality(IDictionary<string, ClAbstractVariable> variables, BinaryExpression expression, ClStrength strength)
         {
             var op = (expression.NodeType == ExpressionType.GreaterThanOrEqual) ? Cl.Operator.GreaterThanOrEqualTo : Cl.Operator.LessThanOrEqualTo;
             return new ClLinearInequality(CreateLinearExpression(variables, expression.Left), op, CreateLinearExpression(variables, expression.Right), strength);

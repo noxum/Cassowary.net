@@ -32,33 +32,7 @@ namespace Cassowary
         /// </remarks>
         public ClSimplexSolver()
         {
-            _stayMinusErrorVars = new List<ClSlackVariable>();
-            _stayPlusErrorVars = new List<ClSlackVariable>();
-            _errorVars = new Dictionary<ClConstraint, HashSet<ClAbstractVariable>>();
-            _markerVars = new Dictionary<ClConstraint, ClAbstractVariable>();
-
-            _resolvePair = new List<ClDouble>(2)
-            {
-                new ClDouble(0),
-                new ClDouble(0)
-            };
-
-            _objective = new ClObjectiveVariable("Z");
-
-            _editVarMap = new Dictionary<ClVariable, ClEditInfo>();
-
-            _slackCounter = 0;
-            _artificialCounter = 0;
-            _dummyCounter = 0;
-            _epsilon = 1e-8;
-
-            _cOptimizeAutomatically = true;
-            _cNeedsSolving = false;
-
-            ClLinearExpression e = new ClLinearExpression();
-            Rows.Add(_objective, e);
-            _stkCedcns = new Stack<int>();
-            _stkCedcns.Push(0);
+            Rows.Add(_objective, new ClLinearExpression());
         }
 
         /// <summary>
@@ -272,14 +246,8 @@ namespace Cassowary
 
             try
             {
-                foreach (var kvp in editVarMapCopy)
-                {
-                    ClEditInfo cei = kvp.Value;
-                    if (cei.Index >= n)
-                    {
-                        RemoveEditVar(kvp.Key);
-                    }
-                }
+                foreach (var kvp in editVarMapCopy.Where(a => a.Value.Index >= n))
+                    RemoveEditVar(kvp.Key);
                 Assert(_editVarMap.Count == n, "_editVarMap.Count == n");
 
                 return this;
@@ -300,7 +268,7 @@ namespace Cassowary
         /// List of points to add weak stay constraints for.
         /// </param>
         /// </summary>
-        public ClSimplexSolver AddPointStays(List<ClPoint> listOfPoints)
+        public ClSimplexSolver AddPointStays(IEnumerable<ClPoint> listOfPoints)
             /* throws ExClRequiredFailure, ExClInternalError */
         {
             double weight = 1.0;
@@ -508,15 +476,8 @@ namespace Cassowary
 
             if (eVars != null)
             {
-                foreach (ClAbstractVariable v in eVars)
-                {
-                    // FIXME: decide wether to use equals or !=
-                    if (v != marker)
-                    {
-                        RemoveColumn(v);
-                        // v = null; // is read-only, cannot be set to null
-                    }
-                }
+                foreach (ClAbstractVariable v in eVars.Where(a => a != marker))
+                    RemoveColumn(v);
             }
 
             if (cn.IsStayConstraint)
@@ -789,7 +750,7 @@ namespace Cassowary
         {
             ClSlackVariable av = new ClSlackVariable(++_artificialCounter, "a");
             ClObjectiveVariable az = new ClObjectiveVariable("az");
-            ClLinearExpression azRow = (ClLinearExpression) expr.Clone();
+            ClLinearExpression azRow = expr.Clone();
 
             AddRow(az, azRow);
             AddRow(av, expr);
@@ -1043,7 +1004,9 @@ namespace Cassowary
             /* throws ExClInternalError */
         {
             ClLinearExpression zRow = RowExpression(zVar);
-            Assert(zRow != null, "zRow != null");
+            if (zRow == null)
+                throw new CassowaryInternalException("Assertion failed: zRow != null");
+
             ClAbstractVariable entryVar = null;
             ClAbstractVariable exitVar = null;
             while (true)
@@ -1059,7 +1022,7 @@ namespace Cassowary
                         entryVar = v;
                     }
                 }
-                if (objectiveCoeff >= -_epsilon || entryVar == null)
+                if (objectiveCoeff >= -EPSILON || entryVar == null)
                     return;
                 double minRatio = Double.MaxValue;
                 var columnVars = Columns[entryVar];
@@ -1080,7 +1043,9 @@ namespace Cassowary
                         }
                     }
                 }
+// ReSharper disable CompareOfFloatsByEqualityOperator
                 if (minRatio == Double.MaxValue)
+// ReSharper restore CompareOfFloatsByEqualityOperator
                 {
                     throw new CassowaryInternalException("Objective function is unbounded in Optimize");
                 }
@@ -1163,9 +1128,7 @@ namespace Cassowary
             ClLinearExpression zRow = RowExpression(_objective);
             while (InfeasibleRows.Count > 0)
             {
-                var enumIfRows = InfeasibleRows.GetEnumerator();
-                enumIfRows.MoveNext();
-                ClAbstractVariable exitVar = enumIfRows.Current;
+                ClAbstractVariable exitVar = InfeasibleRows.First();
 
                 InfeasibleRows.Remove(exitVar);
                 ClAbstractVariable entryVar = null;
@@ -1190,7 +1153,9 @@ namespace Cassowary
                                 }
                             }
                         }
+// ReSharper disable CompareOfFloatsByEqualityOperator
                         if (ratio == Double.MaxValue)
+// ReSharper restore CompareOfFloatsByEqualityOperator
                         {
                             throw new CassowaryInternalException("ratio == nil (Double.MaxValue) in DualOptimize");
                         }
@@ -1307,14 +1272,14 @@ namespace Cassowary
         /// (need both positive and negative since they have only non-negative
         /// values).
         /// </summary>
-        private readonly List<ClSlackVariable> _stayMinusErrorVars;
+        private readonly List<ClSlackVariable> _stayMinusErrorVars = new List<ClSlackVariable>();
 
         /// <summary>
         /// The array of positive error vars for the stay constraints
         /// (need both positive and negative since they have only non-negative
         /// values).
         /// </summary>
-        private readonly List<ClSlackVariable> _stayPlusErrorVars;
+        private readonly List<ClSlackVariable> _stayPlusErrorVars = new List<ClSlackVariable>();
 
         /// <summary>
         /// Give error variables for a non-required constraints,
@@ -1323,7 +1288,7 @@ namespace Cassowary
         /// <remarks>
         /// Map ClConstraint to Set (of ClVariable).
         /// </remarks>
-        private readonly Dictionary<ClConstraint, HashSet<ClAbstractVariable>> _errorVars;
+        private readonly Dictionary<ClConstraint, HashSet<ClAbstractVariable>> _errorVars = new Dictionary<ClConstraint, HashSet<ClAbstractVariable>>();
 
         /// <summary>
         /// Return a lookup table giving the marker variable for
@@ -1332,9 +1297,9 @@ namespace Cassowary
         /// <remarks>
         /// Map ClConstraint to ClVariable.
         /// </remarks>
-        private readonly Dictionary<ClConstraint, ClAbstractVariable> _markerVars;
+        private readonly Dictionary<ClConstraint, ClAbstractVariable> _markerVars = new Dictionary<ClConstraint, ClAbstractVariable>();
 
-        private readonly ClObjectiveVariable _objective;
+        private readonly ClObjectiveVariable _objective = new ClObjectiveVariable("Z");
 
         /// <summary>
         /// Map edit variables to ClEditInfo-s.
@@ -1345,19 +1310,19 @@ namespace Cassowary
         /// resolve(ArrayList...)] interface), and the previous value.
         /// (ClEditInfo replaces the parallel vectors from the Smalltalk impl.)
         /// </remarks>
-        private readonly Dictionary<ClVariable, ClEditInfo> _editVarMap;
+        private readonly Dictionary<ClVariable, ClEditInfo> _editVarMap = new Dictionary<ClVariable, ClEditInfo>();
 
-        private long _slackCounter;
-        private long _artificialCounter;
-        private long _dummyCounter;
+        private long _slackCounter = 0;
+        private long _artificialCounter = 0;
+        private long _dummyCounter = 0;
 
-        private readonly List<ClDouble> _resolvePair;
+        private readonly List<ClDouble> _resolvePair = new List<ClDouble>(2) { new ClDouble(0), new ClDouble(0) };
 
-        private readonly double _epsilon;
+        private const double EPSILON = 1e-8;
 
-        private bool _cOptimizeAutomatically;
-        private bool _cNeedsSolving;
+        private bool _cOptimizeAutomatically = true;
+        private bool _cNeedsSolving = false;
 
-        private readonly Stack<int> _stkCedcns;
+        private readonly Stack<int> _stkCedcns = new Stack<int>(new[] { 0 });
     }
 }

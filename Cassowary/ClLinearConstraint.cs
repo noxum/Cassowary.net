@@ -21,33 +21,36 @@
 
 namespace Cassowary
 {
-  public class ClLinearConstraint : ClConstraint
-  {
-    public ClLinearConstraint(ClLinearExpression cle, ClStrength strength, double weight) : base(strength, weight)
+    public class ClLinearConstraint : ClConstraint
     {
-      _expression = cle;
-    }
+        public ClLinearConstraint(ClLinearExpression cle, ClStrength strength, double weight)
+            : base(strength, weight)
+        {
+            ExpressionField = cle;
+        }
 
-    public ClLinearConstraint(ClLinearExpression cle, ClStrength strength) : base(strength, 1.0)
-    {       
-      _expression = cle;
-    }
+        public ClLinearConstraint(ClLinearExpression cle, ClStrength strength)
+            : base(strength, 1.0)
+        {
+            ExpressionField = cle;
+        }
 
-    public ClLinearConstraint(ClLinearExpression cle) : base(ClStrength.Required, 1.0)
-    {
-      _expression = cle;
-    }
+        public ClLinearConstraint(ClLinearExpression cle)
+            : base(ClStrength.Required, 1.0)
+        {
+            ExpressionField = cle;
+        }
 
-    public override ClLinearExpression Expression
-    {
-      get { return _expression; }
-    }
+        public override ClLinearExpression Expression
+        {
+            get { return ExpressionField; }
+        }
 
-    protected void SetExpression(ClLinearExpression expr)
-    {
-      _expression = expr;
-    }
+        protected void SetExpression(ClLinearExpression expr)
+        {
+            ExpressionField = expr;
+        }
 
-    protected ClLinearExpression _expression;
-  }
+        protected ClLinearExpression ExpressionField;
+    }
 }

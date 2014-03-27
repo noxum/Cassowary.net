@@ -19,6 +19,8 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+using System.Linq;
+
 namespace Cassowary
 {
     public class ClSymbolicWeight
@@ -36,7 +38,7 @@ namespace Cassowary
             _values[2] = w3;
         }
 
-        public ClSymbolicWeight(double[] weights)
+        public ClSymbolicWeight(params double[] weights)
         {
             int cLevels = weights.Length;
             _values = new double[cLevels];
@@ -166,13 +168,9 @@ namespace Cassowary
 
         public bool Equal(ClSymbolicWeight clsw1)
         {
-            for (int i = 0; i < _values.Length; i++)
-            {
-                if (_values[i] != clsw1._values[i])
-                    return false;
-            }
-
-            return true; // they are equal
+// ReSharper disable CompareOfFloatsByEqualityOperator
+            return !_values.Where((t, i) => t != clsw1._values[i]).Any();
+// ReSharper restore CompareOfFloatsByEqualityOperator
         }
 
         public bool GreaterThan(ClSymbolicWeight clsw1)

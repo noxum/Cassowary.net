@@ -20,6 +20,7 @@
 */
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Cassowary
 {
@@ -139,12 +140,8 @@ namespace Cassowary
             {
                 _columns.Remove(var);
 
-
-                foreach (ClAbstractVariable clv in rows)
-                {
-                    ClLinearExpression expr = _rows[clv];
+                foreach (ClLinearExpression expr in rows.Select(clv => _rows[clv]))
                     expr.Terms.Remove(var);
-                }
             }
 
             if (var.IsExternal)
@@ -168,15 +165,8 @@ namespace Cassowary
             // For each variable in this expression, update
             // the column mapping and remove the variable from the list
             // of rows it is known to be in.
-            foreach (ClAbstractVariable clv in expr.Terms.Keys)
-            {
-                var varset = _columns[clv];
-
-                if (varset != null)
-                {
-                    varset.Remove(var);
-                }
-            }
+            foreach (var varset in expr.Terms.Keys.Select(clv => _columns[clv]).Where(varset => varset != null))
+                varset.Remove(var);
 
             InfeasibleRows.Remove(var);
 

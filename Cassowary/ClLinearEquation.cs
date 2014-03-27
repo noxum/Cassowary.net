@@ -41,7 +41,7 @@ namespace Cassowary
         public ClLinearEquation(ClAbstractVariable clv, ClLinearExpression cle, ClStrength strength, double weight = 1.0)
             : base(cle, strength, weight)
         {
-            _expression.AddVariable(clv, -1.0);
+            ExpressionField.AddVariable(clv, -1.0);
         }
 
         public ClLinearEquation(ClAbstractVariable clv, ClLinearExpression cle)
@@ -52,7 +52,7 @@ namespace Cassowary
         public ClLinearEquation(ClAbstractVariable clv, double val, ClStrength strength, double weight = 1.0)
             : base(new ClLinearExpression(val), strength, weight)
         {
-            _expression.AddVariable(clv, -1.0);
+            ExpressionField.AddVariable(clv, -1.0);
         }
 
         public ClLinearEquation(ClAbstractVariable clv,
@@ -64,7 +64,7 @@ namespace Cassowary
         public ClLinearEquation(ClLinearExpression cle, ClAbstractVariable clv, ClStrength strength, double weight = 1.0)
             : base(cle.Clone(), strength, weight)
         {
-            _expression.AddVariable(clv, -1.0);
+            ExpressionField.AddVariable(clv, -1.0);
         }
 
         public ClLinearEquation(ClLinearExpression cle, ClAbstractVariable clv)
@@ -75,7 +75,7 @@ namespace Cassowary
         public ClLinearEquation(ClLinearExpression cle1, ClLinearExpression cle2, ClStrength strength, double weight = 1.0)
             : base(cle1.Clone(), strength, weight)
         {
-            _expression.AddExpression(cle2, -1.0);
+            ExpressionField.AddExpression(cle2, -1.0);
         }
 
         public ClLinearEquation(ClLinearExpression cle1, ClLinearExpression cle2)

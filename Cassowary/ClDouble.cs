@@ -63,16 +63,12 @@ namespace Cassowary
 
         public bool Equals(ClDouble o)
         {
-// ReSharper disable CompareOfFloatsByEqualityOperator
-            return o.Value == _value;
-// ReSharper restore CompareOfFloatsByEqualityOperator
+            return o.Value.Equals(_value);
         }
 
         public override sealed int GetHashCode()
         {
-            Console.Error.WriteLine("ClDouble.GetHashCode() called!");
-
-            return _value.GetHashCode();
+            throw new NotSupportedException();
         }
 
         private double _value;
