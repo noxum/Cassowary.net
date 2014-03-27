@@ -723,6 +723,19 @@ namespace Cassowary
             return ColumnsHasKey(v) || (RowExpression(v) != null);
         }
 
+        public ClAbstractVariable GetVariable(string name)
+        {
+            var c = Columns.Keys.SingleOrDefault(a => a.Name == name);
+            if (c != null)
+                return c;
+
+            var r = Rows.Keys.SingleOrDefault(a => a.Name == name);
+            if (r != null)
+                return r;
+
+            return null;
+        }
+
         public ClSimplexSolver AddVar(ClVariable v)
             /* throws ExClInternalError */
         {

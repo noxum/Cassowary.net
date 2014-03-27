@@ -81,6 +81,7 @@
     <Compile Include="ClObjectiveVariable.cs" />
     <Compile Include="ClPoint.cs" />
     <Compile Include="ClSimplexSolver.cs" />
+    <Compile Include="ClSimplexSolverExtensions.cs" />
     <Compile Include="ClSlackVariable.cs" />
     <Compile Include="ClStayConstraint.cs" />
     <Compile Include="ClStrength.cs" />

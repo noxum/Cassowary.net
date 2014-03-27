@@ -38,7 +38,7 @@ namespace Cassowary
         {
         }
 
-        public ClLinearInequality(ClVariable clv1, Cl.Operator op, ClVariable clv2, ClStrength strength, double weight = 1.0)
+        public ClLinearInequality(ClAbstractVariable clv1, Cl.Operator op, ClAbstractVariable clv2, ClStrength strength, double weight = 1.0)
             : base(new ClLinearExpression(clv2), strength, weight)
             /* throws ExClInternalError */
         {
@@ -57,13 +57,13 @@ namespace Cassowary
             }
         }
 
-        public ClLinearInequality(ClVariable clv1, Cl.Operator op, ClVariable clv2)
+        public ClLinearInequality(ClAbstractVariable clv1, Cl.Operator op, ClVariable clv2)
             : this(clv1, op, clv2, ClStrength.Required, 1.0)
             /* throws ExClInternalError */
         {
         }
 
-        public ClLinearInequality(ClVariable clv, Cl.Operator op, double val, ClStrength strength, double weight = 1.0)
+        public ClLinearInequality(ClAbstractVariable clv, Cl.Operator op, double val, ClStrength strength, double weight = 1.0)
             : base(new ClLinearExpression(val), strength, weight)
             /* throws ExClInternalError */
         {
@@ -82,7 +82,7 @@ namespace Cassowary
             }
         }
 
-        public ClLinearInequality(ClVariable clv, Cl.Operator op, double val)
+        public ClLinearInequality(ClAbstractVariable clv, Cl.Operator op, double val)
             : this(clv, op, val, ClStrength.Required, 1.0)
             /* throws ExClInternalError */
         {
