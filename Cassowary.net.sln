@@ -6,8 +6,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{399D6827-8E7C-46B9-B265-95DE1D70BA29}"
 	ProjectSection(SolutionItems) = preProject
 		Cassowary.net.vsmdi = Cassowary.net.vsmdi
-		Local.testsettings = Local.testsettings
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cassowary", "Cassowary\Cassowary.csproj", "{F01578A3-BA19-47E6-B333-40E41158658B}"

@@ -10,6 +10,8 @@ _NCrunch*
 *.ncrunchsolution
 *.vsmdi
 *.testsettings
+*.nuspec
+*.ps1
 
 obj
 bin
