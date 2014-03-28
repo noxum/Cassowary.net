@@ -10,27 +10,27 @@ namespace Cassowary
         private static readonly ClStrength _defaultStrength = ClStrength.Required;
 
         #region add
-        public static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, Expression<Func<double, bool>> constraint, ClStrength strength = null)
+        public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, Expression<Func<double, bool>> constraint, ClStrength strength = null)
         {
             return AddConstraint(solver, constraint.Parameters, constraint.Body, strength);
         }
 
-        public static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, bool>> constraint, ClStrength strength = null)
+        public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, bool>> constraint, ClStrength strength = null)
         {
             return AddConstraint(solver, constraint.Parameters, constraint.Body, strength);
         }
 
-        public static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, double, bool>> constraint, ClStrength strength = null)
+        public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, double, bool>> constraint, ClStrength strength = null)
         {
             return AddConstraint(solver, constraint.Parameters, constraint.Body, strength);
         }
 
-        public static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, double, double, bool>> constraint, ClStrength strength = null)
+        public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, double, double, bool>> constraint, ClStrength strength = null)
         {
             return AddConstraint(solver, constraint.Parameters, constraint.Body, strength);
         }
 
-        private static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, IEnumerable<ParameterExpression> parameters, Expression body, ClStrength strength)
+        private static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, IEnumerable<ParameterExpression> parameters, Expression body, ClStrength strength)
         {
             Dictionary<string, ClAbstractVariable> variables = parameters.Select(a => solver.GetVariable(a.Name) ?? new ClVariable(a.Name)).ToDictionary(a => a.Name);
 
@@ -38,7 +38,7 @@ namespace Cassowary
             foreach (var c in constraints)
                 solver.AddConstraint(c);
 
-            return solver;
+            return variables.Values;
         }
         #endregion
 
