@@ -78,18 +78,7 @@ namespace Cassowary
             if (variables.Length != parameters.Count)
                 throw new ArgumentException(string.Format("Expected {0} parameters, found {1}", parameters.Count, variables.Length));
 
-            var names = Enumerable.Range('a', 26).Select(a => Convert.ToChar(a).ToString(CultureInfo.InvariantCulture)).ToArray();
-
-            Dictionary<string, ClAbstractVariable> map = new Dictionary<string, ClAbstractVariable>();
-            for (int i = 0; i < parameters.Count; i++)
-            {
-                if (parameters[i].Name != names[i])
-                    throw new ArgumentException(string.Format("Parameter at position {0} must be named {1}, instead of {2}", i, names[i], parameters[i].Name));
-
-                map[names[i]] = variables[i];
-            }
-
-            return map;
+            return parameters.Select((p, i) => new {name = p.Name, variable = variables[i]}).ToDictionary(a => a.name, a => a.variable);
         }
         #endregion
 
