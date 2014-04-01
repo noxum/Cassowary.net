@@ -243,10 +243,38 @@ namespace CassowaryTests
             Assert.IsTrue(dd * 2 + 3 - aa <= 20);
         }
 
-        //[TestMethod]
-        //public void Playground()
-        //{
-        //    _solver.AddConstraint(a => a > 10 & a < 20);
-        //}
+        [TestMethod]
+        public void FieldMemberAccessExpression()
+        {
+// ReSharper disable ConvertToConstant.Local
+            double field = 1;
+// ReSharper restore ConvertToConstant.Local
+
+            var variable = new ClVariable("a");
+
+// ReSharper disable CompareOfFloatsByEqualityOperator
+            _solver.AddConstraint(variable, a => a == field);
+// ReSharper restore CompareOfFloatsByEqualityOperator
+        }
+
+        [TestMethod]
+        public void ConvertExpression()
+        {
+// ReSharper disable ConvertToConstant.Local
+            float field = 1;
+// ReSharper restore ConvertToConstant.Local
+
+            var variable = new ClVariable("a");
+
+// ReSharper disable CompareOfFloatsByEqualityOperator
+            _solver.AddConstraint(variable, a => a == field);
+// ReSharper restore CompareOfFloatsByEqualityOperator
+        }
+
+        [TestMethod]
+        public void Playground()
+        {
+
+        }
     }
 }

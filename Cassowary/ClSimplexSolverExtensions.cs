@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace Cassowary
 {
@@ -135,9 +135,41 @@ namespace Cassowary
                     return Cl.Divide(CreateLinearExpression(variables, b.Left), CreateLinearExpression(variables, b.Right));
                 }
                 case ExpressionType.Parameter:
-                    return new ClLinearExpression(variables[((ParameterExpression)a).Name]);
+                    return new ClLinearExpression((ClVariable)variables[((ParameterExpression)a).Name]);
                 case ExpressionType.Constant:
-                    return new ClLinearExpression((double)((ConstantExpression)a).Value);
+                case ExpressionType.MemberAccess:
+                case ExpressionType.Convert:
+                    return new ClLinearExpression(GetValue(variables, a));
+                default:
+                    throw new ArgumentException(string.Format("Invalid node type {0}", a.NodeType), "a");
+            }
+        }
+
+        private static double GetValue(IDictionary<string, ClAbstractVariable> variables, Expression a)
+        {
+            switch (a.NodeType)
+            {
+                case ExpressionType.Parameter:
+                    
+                case ExpressionType.Constant:
+                    return Convert.ToDouble(((ConstantExpression)a).Value);
+                case ExpressionType.MemberAccess:
+                    var memberAccess = (MemberExpression)a;
+                    var fieldInfo = memberAccess.Member as FieldInfo;
+                    if (fieldInfo != null)
+                        return Convert.ToDouble(fieldInfo.GetValue(Expression.Lambda<Func<object>>(memberAccess.Expression).Compile().Invoke()));
+                    else
+                    {
+                        var info = memberAccess.Member as PropertyInfo;
+                        if (info != null)
+                            return Convert.ToDouble(info.GetValue(Expression.Lambda<Func<object>>(memberAccess.Expression).Compile().Invoke(), null));
+                        else
+                            throw new ArgumentException(string.Format("Invalid node type MemberAccess, {0}", memberAccess.Member.GetType()));
+                    }
+                case ExpressionType.Convert:
+                    var e = (UnaryExpression)a;
+                    var v = GetValue(variables, e.Operand);
+                    return v;
                 default:
                     throw new ArgumentException(string.Format("Invalid node type {0}", a.NodeType), "a");
             }
