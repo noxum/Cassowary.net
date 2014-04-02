@@ -281,7 +281,7 @@ namespace CassowaryTests
             var variable = new ClVariable("a");
 
 // ReSharper disable CompareOfFloatsByEqualityOperator
-            _solver.AddConstraint(variable, a => a == field / 2 * 3 + 4 - 2);
+            _solver.AddConstraint(variable, a => a == -field / 2 * 3 + 4 - 2);
 // ReSharper restore CompareOfFloatsByEqualityOperator
         }
 

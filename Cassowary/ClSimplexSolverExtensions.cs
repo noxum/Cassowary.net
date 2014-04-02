@@ -190,6 +190,11 @@ namespace Cassowary
                         var b = (BinaryExpression)a;
                         return GetValue(variables, b.Left) / GetValue(variables, b.Right);
                     }
+                case ExpressionType.Negate:
+                {
+                    var u = (UnaryExpression)a;
+                    return -GetValue(variables, u.Operand);
+                }
                 default:
                     throw new ArgumentException(string.Format("Invalid node type {0}", a.NodeType), "a");
             }
