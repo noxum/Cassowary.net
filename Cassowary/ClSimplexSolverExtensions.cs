@@ -135,22 +135,20 @@ namespace Cassowary
                     return Cl.Divide(CreateLinearExpression(variables, b.Left), CreateLinearExpression(variables, b.Right));
                 }
                 case ExpressionType.Parameter:
-                    return new ClLinearExpression((ClVariable)variables[((ParameterExpression)a).Name]);
+                    return new ClLinearExpression(variables[((ParameterExpression)a).Name]);
                 case ExpressionType.Constant:
                 case ExpressionType.MemberAccess:
                 case ExpressionType.Convert:
-                    return new ClLinearExpression(GetValue(variables, a));
+                    return new ClLinearExpression(GetValue(a));
                 default:
                     throw new ArgumentException(string.Format("Invalid node type {0}", a.NodeType), "a");
             }
         }
 
-        private static double GetValue(IDictionary<string, ClAbstractVariable> variables, Expression a)
+        private static double GetValue(Expression a)
         {
             switch (a.NodeType)
             {
-                case ExpressionType.Parameter:
-                    
                 case ExpressionType.Constant:
                     return Convert.ToDouble(((ConstantExpression)a).Value);
                 case ExpressionType.MemberAccess:
@@ -168,32 +166,32 @@ namespace Cassowary
                     }
                 case ExpressionType.Convert:
                     var e = (UnaryExpression)a;
-                    var v = GetValue(variables, e.Operand);
+                    var v = GetValue(e.Operand);
                     return v;
                 case ExpressionType.Add:
                     {
                         var b = (BinaryExpression)a;
-                        return GetValue(variables, b.Left) + GetValue(variables, b.Right);
+                        return GetValue(b.Left) + GetValue(b.Right);
                     }
                 case ExpressionType.Subtract:
                     {
                         var b = (BinaryExpression)a;
-                        return GetValue(variables, b.Left) - GetValue(variables, b.Right);
+                        return GetValue(b.Left) - GetValue(b.Right);
                     }
                 case ExpressionType.Multiply:
                     {
                         var b = (BinaryExpression)a;
-                        return GetValue(variables, b.Left) * GetValue(variables, b.Right);
+                        return GetValue(b.Left) * GetValue(b.Right);
                     }
                 case ExpressionType.Divide:
                     {
                         var b = (BinaryExpression)a;
-                        return GetValue(variables, b.Left) / GetValue(variables, b.Right);
+                        return GetValue(b.Left) / GetValue(b.Right);
                     }
                 case ExpressionType.Negate:
                 {
                     var u = (UnaryExpression)a;
-                    return -GetValue(variables, u.Operand);
+                    return -GetValue(u.Operand);
                 }
                 default:
                     throw new ArgumentException(string.Format("Invalid node type {0}", a.NodeType), "a");

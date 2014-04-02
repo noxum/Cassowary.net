@@ -288,7 +288,17 @@ namespace CassowaryTests
         [TestMethod]
         public void Playground()
         {
+            var windowHeight = new ClVariable(1);
+            _solver.AddStay(windowHeight);
+            var doorHeightVariable = new ClVariable(2);
+            _solver.AddStay(doorHeightVariable);
 
+            var margin = new ClVariable("margin");
+// ReSharper disable CompareOfFloatsByEqualityOperator
+            _solver.AddConstraint(windowHeight, doorHeightVariable, margin, (wh, dh, wm) => ((5 - dh) - wh) == wm * 2);
+// ReSharper restore CompareOfFloatsByEqualityOperator
+
+            Assert.AreEqual(5 - 2 - 1, margin.Value * 2);
         }
     }
 }
