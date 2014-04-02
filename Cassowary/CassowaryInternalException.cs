@@ -19,8 +19,11 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+using System;
+
 namespace Cassowary
 {
+    [Serializable]
     public class CassowaryInternalException : CassowaryException
     {
         public CassowaryInternalException(string s)

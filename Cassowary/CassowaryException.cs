@@ -23,17 +23,18 @@ using System;
 
 namespace Cassowary
 {
-  public class CassowaryException : Exception
-  {
-      public CassowaryException()
-          : base("(ExClError) An error has occured in CL")
-      {
-      }
+    [Serializable]
+    public class CassowaryException : Exception
+    {
+        public CassowaryException()
+            : base("(ExClError) An error has occured in CL")
+        {
+        }
 
-      public CassowaryException(string message)
-          : base(message)
-      {
-          
-      }
-  }
+        public CassowaryException(string message)
+            : base(message)
+        {
+
+        }
+    }
 }
