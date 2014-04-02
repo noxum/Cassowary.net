@@ -170,6 +170,26 @@ namespace Cassowary
                     var e = (UnaryExpression)a;
                     var v = GetValue(variables, e.Operand);
                     return v;
+                case ExpressionType.Add:
+                    {
+                        var b = (BinaryExpression)a;
+                        return GetValue(variables, b.Left) + GetValue(variables, b.Right);
+                    }
+                case ExpressionType.Subtract:
+                    {
+                        var b = (BinaryExpression)a;
+                        return GetValue(variables, b.Left) - GetValue(variables, b.Right);
+                    }
+                case ExpressionType.Multiply:
+                    {
+                        var b = (BinaryExpression)a;
+                        return GetValue(variables, b.Left) * GetValue(variables, b.Right);
+                    }
+                case ExpressionType.Divide:
+                    {
+                        var b = (BinaryExpression)a;
+                        return GetValue(variables, b.Left) / GetValue(variables, b.Right);
+                    }
                 default:
                     throw new ArgumentException(string.Format("Invalid node type {0}", a.NodeType), "a");
             }

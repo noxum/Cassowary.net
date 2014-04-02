@@ -272,6 +272,20 @@ namespace CassowaryTests
         }
 
         [TestMethod]
+        public void FieldMemberAccessWithArithmeticExpression()
+        {
+// ReSharper disable ConvertToConstant.Local
+            float field = 1;
+// ReSharper restore ConvertToConstant.Local
+
+            var variable = new ClVariable("a");
+
+// ReSharper disable CompareOfFloatsByEqualityOperator
+            _solver.AddConstraint(variable, a => a == field / 2 * 3 + 4 - 2);
+// ReSharper restore CompareOfFloatsByEqualityOperator
+        }
+
+        [TestMethod]
         public void Playground()
         {
 
