@@ -21,7 +21,8 @@
 
 namespace Cassowary
 {
-    public class ClVariable : ClAbstractVariable
+    public class ClVariable
+        : ClAbstractVariable
     {
         public ClVariable(string name, double value)
             : base(name)
@@ -47,9 +48,8 @@ namespace Cassowary
         }
 
         public ClVariable(long number, string prefix)
-            : base(number, prefix)
+            : this(number, prefix, 0.0)
         {
-            Value = 0.0;
         }
 
         public override bool IsDummy
@@ -77,21 +77,6 @@ namespace Cassowary
             return "[" + Name + ":" + Value + "]";
         }
 
-        /// <remarks>
-        /// Change the value held -- should *not* use this if the variable is 
-        /// in a solver -- instead use AddEditVar() and SuggestValue() interface
-        /// </remarks>
-        public double Value { get; private set; }
-
-        /// <remarks>
-        /// Permit overriding in subclasses in case something needs to be
-        /// done when the value is changed by the solver
-        /// may be called when the value hasn't actually changed -- just
-        /// means the solver is setting the external variable
-        /// </remarks>
-        public virtual void ChangeValue(double value)
-        {
-            Value = value;
-        }
+        public double Value { get; internal set; }
     }
 }

@@ -111,7 +111,7 @@ namespace Cassowary
             _rows.Add(var, expr);
 
             // FIXME: check correctness!
-            foreach (ClAbstractVariable clv in expr.Terms.Keys)
+            foreach (var clv in expr.Terms.Keys)
             {
                 InsertColVar(clv, var);
 
@@ -140,7 +140,7 @@ namespace Cassowary
             {
                 _columns.Remove(var);
 
-                foreach (ClLinearExpression expr in rows.Select(clv => _rows[clv]))
+                foreach (var expr in rows.Select(clv => _rows[clv]))
                     expr.Terms.Remove(var);
             }
 
@@ -158,9 +158,9 @@ namespace Cassowary
         protected ClLinearExpression RemoveRow(ClAbstractVariable var)
             /*throws ExCLInternalError*/
         {
-            ClLinearExpression expr = _rows[var];
+            var expr = _rows[var];
             if (expr == null)
-                throw new CassowaryInternalException("Assertion failed");
+                throw new CassowaryInternalException("linear expression is null");
 
             // For each variable in this expression, update
             // the column mapping and remove the variable from the list
@@ -187,9 +187,9 @@ namespace Cassowary
         {
             var varset = _columns[oldVar];
 
-            foreach (ClAbstractVariable v in varset)
+            foreach (var v in varset)
             {
-                ClLinearExpression row = _rows[v];
+                var row = _rows[v];
                 row.SubstituteOut(oldVar, expr, v, this);
                 if (v.IsRestricted && row.Constant < 0.0)
                 {

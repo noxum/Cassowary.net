@@ -30,9 +30,8 @@ namespace Cassowary
         }
 
         public ClStrength(string name, double w1, double w2, double w3)
+            : this(name, new ClSymbolicWeight(w1, w2, w3))
         {
-            Name = name;
-            SymbolicWeight = new ClSymbolicWeight(w1, w2, w3);
         }
 
         public bool IsRequired

@@ -103,6 +103,8 @@ namespace Cassowary
                 }
                 case ExpressionType.LessThanOrEqual:
                 case ExpressionType.GreaterThanOrEqual:
+                case ExpressionType.LessThan:
+                case ExpressionType.GreaterThan:
                 {
                     yield return CreateLinearInequality(variables, (BinaryExpression) expression, strength);
                     break;
@@ -156,14 +158,12 @@ namespace Cassowary
                     var fieldInfo = memberAccess.Member as FieldInfo;
                     if (fieldInfo != null)
                         return Convert.ToDouble(fieldInfo.GetValue(Expression.Lambda<Func<object>>(memberAccess.Expression).Compile().Invoke()));
-                    else
-                    {
+                    
                         var info = memberAccess.Member as PropertyInfo;
-                        if (info != null)
-                            return Convert.ToDouble(info.GetValue(Expression.Lambda<Func<object>>(memberAccess.Expression).Compile().Invoke(), null));
-                        else
-                            throw new ArgumentException(string.Format("Invalid node type MemberAccess, {0}", memberAccess.Member.GetType()));
-                    }
+                    if (info != null)
+                        return Convert.ToDouble(info.GetValue(Expression.Lambda<Func<object>>(memberAccess.Expression).Compile().Invoke(), null));
+                        
+                    throw new ArgumentException(string.Format("Invalid node type MemberAccess, {0}", memberAccess.Member.GetType()));
                 case ExpressionType.Convert:
                     var e = (UnaryExpression)a;
                     var v = GetValue(e.Operand);
@@ -205,7 +205,25 @@ namespace Cassowary
 
         private static ClLinearInequality CreateLinearInequality(IDictionary<string, ClAbstractVariable> variables, BinaryExpression expression, ClStrength strength)
         {
-            var op = (expression.NodeType == ExpressionType.GreaterThanOrEqual) ? Cl.Operator.GreaterThanOrEqualTo : Cl.Operator.LessThanOrEqualTo;
+            Cl.Operator op;
+            switch (expression.NodeType)
+            {
+                case ExpressionType.GreaterThan:
+                    op = Cl.Operator.GreaterThan;
+                    break;
+                case ExpressionType.GreaterThanOrEqual:
+                    op = Cl.Operator.GreaterThanOrEqualTo;
+                    break;
+                case ExpressionType.LessThan:
+                    op = Cl.Operator.LessThan;
+                    break;
+                case ExpressionType.LessThanOrEqual:
+                    op = Cl.Operator.LessThanOrEqualTo;
+                    break;
+                default:
+                    throw new NotSupportedException(string.Format("Unsupported linear inequality operator \"{0}\"", expression.NodeType));
+            }
+
             return new ClLinearInequality(CreateLinearExpression(variables, expression.Left), op, CreateLinearExpression(variables, expression.Right), strength);
         }
         #endregion

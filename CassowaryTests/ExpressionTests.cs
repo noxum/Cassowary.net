@@ -1,10 +1,6 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Cassowary;
+﻿using Cassowary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace CassowaryTests
 {
@@ -283,6 +279,16 @@ namespace CassowaryTests
 // ReSharper disable CompareOfFloatsByEqualityOperator
             _solver.AddConstraint(variable, a => a == -field / 2 * 3 + 4 - 2);
 // ReSharper restore CompareOfFloatsByEqualityOperator
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(CassowaryNonlinearExpressionException))]
+        public void NonLinearExpressionThrowsException()
+        {
+            var a = new ClVariable("a");
+            var b = new ClVariable("b");
+
+            _solver.AddConstraint(a, b, (x, y) => (x / y) >= (y / x));
         }
 
         [TestMethod]

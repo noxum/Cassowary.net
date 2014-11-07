@@ -40,6 +40,7 @@ namespace Cassowary
             return new ClDouble(_value);
         }
 
+        private double _value;
         public double Value
         {
             get { return _value; }
@@ -55,10 +56,9 @@ namespace Cassowary
         {
             if (o == null)
                 return false;
+
             var d = o as ClDouble;
-            if (d != null)
-                return Equals(d);
-            return ReferenceEquals(this, o);
+            return d != null && Equals(d);
         }
 
         public bool Equals(ClDouble o)
@@ -70,7 +70,5 @@ namespace Cassowary
         {
             throw new NotSupportedException();
         }
-
-        private double _value;
     }
 }

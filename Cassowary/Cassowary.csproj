@@ -63,9 +63,7 @@
     <Compile Include="CassowaryException.cs" />
     <Compile Include="CassowaryInternalException.cs" />
     <Compile Include="CassowaryNonlinearExpressionException.cs" />
-    <Compile Include="CassowaryNotEnoughStaysException.cs" />
     <Compile Include="CassowaryRequiredFailureException.cs" />
-    <Compile Include="CassowaryTooDifficultException.cs" />
     <Compile Include="Cl.cs" />
     <Compile Include="ClAbstractVariable.cs" />
     <Compile Include="ClConstraint.cs" />

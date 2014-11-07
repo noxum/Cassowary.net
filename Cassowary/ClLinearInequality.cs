@@ -39,22 +39,9 @@ namespace Cassowary
         }
 
         public ClLinearInequality(ClAbstractVariable clv1, Cl.Operator op, ClAbstractVariable clv2, ClStrength strength, double weight = 1.0)
-            : base(new ClLinearExpression(clv2), strength, weight)
+            : this(new ClLinearExpression(clv1), op, new ClLinearExpression(clv2), strength, weight)
             /* throws ExClInternalError */
         {
-            switch (op)
-            {
-                case Cl.Operator.GreaterThanOrEqualTo:
-                    ExpressionField.MultiplyMe(-1.0);
-                    ExpressionField.AddVariable(clv1);
-                    break;
-                case Cl.Operator.LessThanOrEqualTo:
-                    ExpressionField.AddVariable(clv1, -1.0);
-                    break;
-                default:
-                    // invalid operator
-                    throw new CassowaryInternalException("Invalid operator in ClLinearInequality constructor");
-            }
         }
 
         public ClLinearInequality(ClAbstractVariable clv1, Cl.Operator op, ClAbstractVariable clv2)
@@ -64,47 +51,15 @@ namespace Cassowary
         }
 
         public ClLinearInequality(ClAbstractVariable clv, Cl.Operator op, double val, ClStrength strength, double weight = 1.0)
-            : base(new ClLinearExpression(val), strength, weight)
+            :this(new ClLinearExpression(clv), op, new ClLinearExpression(val), strength, weight)
             /* throws ExClInternalError */
         {
-            switch (op)
-            {
-                case Cl.Operator.GreaterThanOrEqualTo:
-                    ExpressionField.MultiplyMe(-1.0);
-                    ExpressionField.AddVariable(clv);
-                    break;
-                case Cl.Operator.LessThanOrEqualTo:
-                    ExpressionField.AddVariable(clv, -1.0);
-                    break;
-                default:
-                    // invalid operator
-                    throw new CassowaryInternalException("Invalid operator in ClLinearInequality constructor");
-            }
         }
 
         public ClLinearInequality(ClAbstractVariable clv, Cl.Operator op, double val)
             : this(clv, op, val, ClStrength.Required)
             /* throws ExClInternalError */
         {
-        }
-
-        public ClLinearInequality(ClLinearExpression cle1, Cl.Operator op, ClLinearExpression cle2, ClStrength strength, double weight = 1.0)
-            : base(cle2.Clone(), strength, weight)
-            /* throws ExClInternalError */
-        {
-            switch (op)
-            {
-                case Cl.Operator.GreaterThanOrEqualTo:
-                    ExpressionField.MultiplyMe(-1.0);
-                    ExpressionField.AddExpression(cle1);
-                    break;
-                case Cl.Operator.LessThanOrEqualTo:
-                    ExpressionField.AddExpression(cle1, -1.0);
-                    break;
-                default:
-                    // invalid operator
-                    throw new CassowaryInternalException("Invalid operator in ClLinearInequality constructor");
-            }
         }
 
         public ClLinearInequality(ClLinearExpression cle1, Cl.Operator op, ClLinearExpression cle2)
@@ -114,22 +69,9 @@ namespace Cassowary
         }
 
         public ClLinearInequality(ClAbstractVariable clv, Cl.Operator op, ClLinearExpression cle, ClStrength strength, double weight = 1.0)
-            : base(cle.Clone(), strength, weight)
+            : this(new ClLinearExpression(clv), op, cle, strength, weight)
             /* throws ExClInternalError */
         {
-            switch (op)
-            {
-                case Cl.Operator.GreaterThanOrEqualTo:
-                    ExpressionField.MultiplyMe(-1.0);
-                    ExpressionField.AddVariable(clv);
-                    break;
-                case Cl.Operator.LessThanOrEqualTo:
-                    ExpressionField.AddVariable(clv, -1.0);
-                    break;
-                default:
-                    // invalid operator
-                    throw new CassowaryInternalException("Invalid operator in ClLinearInequality constructor");
-            }
         }
 
         public ClLinearInequality(ClAbstractVariable clv, Cl.Operator op, ClLinearExpression cle)
@@ -139,17 +81,38 @@ namespace Cassowary
         }
 
         public ClLinearInequality(ClLinearExpression cle, Cl.Operator op, ClAbstractVariable clv, ClStrength strength, double weight = 1.0)
-            : base(cle.Clone(), strength, weight)
+            : this(cle, op, new ClLinearExpression(clv), strength, weight)
             /* throws ExClInternalError */
         {
+        }
+
+        public ClLinearInequality(ClLinearExpression cle, Cl.Operator op, ClAbstractVariable clv)
+            : this(cle, op, clv, ClStrength.Required)
+            /* throws ExClInternalError */
+        {
+        }
+
+        public ClLinearInequality(ClLinearExpression cle1, Cl.Operator op, ClLinearExpression cle2, ClStrength strength, double weight = 1.0)
+            : base(cle2.Clone(), strength, weight)
+        /* throws ExClInternalError */
+        {
+            const double epsilon = 1e-8;
+
             switch (op)
             {
-                case Cl.Operator.LessThanOrEqualTo:
-                    ExpressionField.MultiplyMe(-1.0);
-                    ExpressionField.AddVariable(clv);
-                    break;
                 case Cl.Operator.GreaterThanOrEqualTo:
-                    ExpressionField.AddVariable(clv, -1.0);
+                    SetupGreaterThanOrEqualTo(cle1);
+                    break;
+                case Cl.Operator.GreaterThan:
+                    SetupGreaterThanOrEqualTo(cle1);
+                    ExpressionField.IncrementConstant(-epsilon);
+                    break;
+                case Cl.Operator.LessThanOrEqualTo:
+                    SetupLessThanOrEqualTo(cle1);
+                    break;
+                case Cl.Operator.LessThan:
+                    SetupLessThanOrEqualTo(cle1);
+                    ExpressionField.IncrementConstant(-epsilon);
                     break;
                 default:
                     // invalid operator
@@ -157,10 +120,15 @@ namespace Cassowary
             }
         }
 
-        public ClLinearInequality(ClLinearExpression cle, Cl.Operator op, ClAbstractVariable clv)
-            : this(cle, op, clv, ClStrength.Required)
-            /* throws ExClInternalError */
+        private void SetupGreaterThanOrEqualTo(ClLinearExpression expr)
         {
+            ExpressionField.MultiplyMe(-1.0);
+            ExpressionField.AddExpression(expr);
+        }
+
+        private void SetupLessThanOrEqualTo(ClLinearExpression expr)
+        {
+            ExpressionField.AddExpression(expr, -1.0);
         }
 
         public override sealed bool IsInequality

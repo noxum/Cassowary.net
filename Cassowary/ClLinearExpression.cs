@@ -56,7 +56,7 @@ namespace Cassowary
             _terms = new Dictionary<ClAbstractVariable, ClDouble>();
 
             // need to unalias the ClDouble-s that we clone (do a deep clone)
-            foreach (ClAbstractVariable clv in terms.Keys)
+            foreach (var clv in terms.Keys)
             {
                 _terms.Add(clv, (terms[clv]).Clone());
             }
@@ -66,7 +66,7 @@ namespace Cassowary
         {
             _constant.Value = _constant.Value * x;
 
-            foreach (ClDouble cld in _terms.Keys.Select(a => _terms[a]))
+            foreach (var cld in _terms.Keys.Select(a => _terms[a]))
                 cld.Value = cld.Value * x;
 
             return this;
@@ -86,13 +86,10 @@ namespace Cassowary
             /*throws ExCLNonlinearExpression*/
         {
             if (IsConstant)
-            {
                 return expr.Times(_constant.Value);
-            }
-            else if (!expr.IsConstant)
-            {
+
+            if (!expr.IsConstant)
                 throw new CassowaryNonlinearExpressionException();
-            }
 
             return Times(expr._constant.Value);
         }

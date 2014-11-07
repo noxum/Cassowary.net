@@ -19,34 +19,35 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 
 namespace Cassowary
 {
     public class ClSymbolicWeight
     {
-        public ClSymbolicWeight(int cLevels)
-        {
-            _values = new double[cLevels];
-        }
-
         public ClSymbolicWeight(double w1, double w2, double w3)
         {
-            _values = new double[3];
-            _values[0] = w1;
-            _values[1] = w2;
-            _values[2] = w3;
+            _values = Array.AsReadOnly(new[] { w1, w2, w3 });
         }
 
         public ClSymbolicWeight(params double[] weights)
         {
-            int cLevels = weights.Length;
-            _values = new double[cLevels];
+            _values = Array.AsReadOnly((double[])weights.Clone());
+        }
 
-            for (int i = 0; i < cLevels; i++)
-            {
-                _values[i] = weights[i];
-            }
+        protected ClSymbolicWeight(ReadOnlyCollection<double> weights)
+        {
+            _values = weights;
+        }
+
+        protected ClSymbolicWeight(IEnumerable<double> weights)
+            : this(weights.ToArray())
+        {
         }
 
         protected virtual ClSymbolicWeight Clone()
@@ -66,14 +67,7 @@ namespace Cassowary
 
         public ClSymbolicWeight Times(double n)
         {
-            ClSymbolicWeight clsw = Clone();
-
-            for (int i = 0; i < _values.Length; i++)
-            {
-                clsw._values[i] *= n;
-            }
-
-            return clsw;
+            return new ClSymbolicWeight(_values.Select(a => a * n).ToArray());
         }
 
         public static ClSymbolicWeight operator /(ClSymbolicWeight clsw, double n)
@@ -81,22 +75,11 @@ namespace Cassowary
             return clsw.DivideBy(n);
         }
 
-        public static ClSymbolicWeight operator /(double n, ClSymbolicWeight clsw)
-        {
-            return clsw.DivideBy(n);
-        }
-
         private ClSymbolicWeight DivideBy(double n)
         {
             // Assert(n != 0);
-            ClSymbolicWeight clsw = Clone();
 
-            for (int i = 0; i < _values.Length; i++)
-            {
-                clsw._values[i] /= n;
-            }
-
-            return clsw;
+            return new ClSymbolicWeight(_values.Select(a => a / n).ToArray());
         }
 
         public static ClSymbolicWeight operator +(ClSymbolicWeight clsw1, ClSymbolicWeight clsw2)
@@ -107,14 +90,8 @@ namespace Cassowary
         private ClSymbolicWeight Add(ClSymbolicWeight clsw1)
         {
             // Assert(clws.CLevels == CLevels);
-            ClSymbolicWeight clsw = Clone();
 
-            for (int i = 0; i < _values.Length; i++)
-            {
-                clsw._values[i] += clsw1._values[i];
-            }
-
-            return clsw;
+            return new ClSymbolicWeight(_values.Select((a, i) => a + clsw1._values[i]).ToArray());
         }
 
         public static ClSymbolicWeight operator -(ClSymbolicWeight clsw1, ClSymbolicWeight clsw2)
@@ -125,14 +102,8 @@ namespace Cassowary
         private ClSymbolicWeight Subtract(ClSymbolicWeight clsw1)
         {
             // Assert(clsw1.CLevels == CLevels);
-            ClSymbolicWeight clsw = Clone();
 
-            for (int i = 0; i < _values.Length; i++)
-            {
-                clsw._values[i] -= clsw1._values[i];
-            }
-
-            return clsw;
+            return new ClSymbolicWeight(_values.Select((a, i) => a - clsw1._values[i]).ToArray());
         }
 
         // TODO: comparison operators (<, <=, >, >=, ==)
@@ -140,11 +111,11 @@ namespace Cassowary
         {
             // Assert(clsw1.CLevels == CLevels);
 
-            for (int i = 0; i < _values.Length; i++)
+            for (var i = 0; i < _values.Count; i++)
             {
                 if (_values[i] < clsw1._values[i])
                     return true;
-                else if (_values[i] > clsw1._values[i])
+                if (_values[i] > clsw1._values[i])
                     return false;
             }
 
@@ -155,11 +126,11 @@ namespace Cassowary
         {
             // Assert(clsw1.CLevels == CLevels);
 
-            for (int i = 0; i < _values.Length; i++)
+            for (var i = 0; i < _values.Count; i++)
             {
                 if (_values[i] < clsw1._values[i])
                     return true;
-                else if (_values[i] > clsw1._values[i])
+                if (_values[i] > clsw1._values[i])
                     return false;
             }
 
@@ -178,18 +149,13 @@ namespace Cassowary
             return !LessThan(clsw1);
         }
 
-        public bool IsNegative()
-        {
-            return LessThan(ClsZero);
-        }
-
         public double AsDouble()
         {
             double sum = 0;
             double factor = 1;
             const double multiplier = 1000;
 
-            for (int i = _values.Length - 1; i >= 0; i--)
+            for (var i = _values.Count - 1; i >= 0; i--)
             {
                 sum += _values[i] * factor;
                 factor *= multiplier;
@@ -200,30 +166,18 @@ namespace Cassowary
 
         public override string ToString()
         {
-            string result = "[";
+            var builder = new StringBuilder('[')
+                .Append(string.Join(",", _values.Select(a => a.ToString(CultureInfo.InvariantCulture)).ToArray()))
+                .Append("]");
 
-            for (int i = 0; i < _values.Length - 1; i++)
-            {
-                result += _values[i] + ",";
-            }
-
-            result += _values[_values.Length - 1] + "]";
-
-            return result;
+            return builder.ToString();
         }
 
         public int CLevels
         {
-            get { return _values.Length; }
+            get { return _values.Count; }
         }
 
-        public static ClSymbolicWeight ClsZero
-        {
-            get { return _clsZero; }
-        }
-
-        private readonly double[] _values;
-
-        private static readonly ClSymbolicWeight _clsZero = new ClSymbolicWeight(0.0, 0.0, 0.0);
+        private readonly ReadOnlyCollection<double> _values;
     }
 }

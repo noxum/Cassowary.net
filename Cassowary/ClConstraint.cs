@@ -23,22 +23,10 @@ namespace Cassowary
 {
     public abstract class ClConstraint
     {
-        protected ClConstraint(ClStrength strength, double weight)
+        protected ClConstraint(ClStrength strength, double weight = 1.0)
         {
             _strength = strength;
-            Weight = weight;
-        }
-
-        protected ClConstraint(ClStrength strength)
-        {
-            _strength = strength;
-            Weight = 1.0;
-        }
-
-        protected ClConstraint()
-        {
-            _strength = ClStrength.Required;
-            Weight = 1.0;
+            _weight = weight;
         }
 
         public abstract ClLinearExpression Expression { get; }
@@ -63,13 +51,14 @@ namespace Cassowary
             get { return false; }
         }
 
+        private readonly ClStrength _strength = ClStrength.Required;
         public ClStrength Strength
         {
             get { return _strength; }
-            set { _strength = value; }
         }
 
-        public double Weight { get; private set; }
+        private readonly double _weight = 1;
+        public double Weight { get { return _weight; } }
 
         public override string ToString()
         {
@@ -79,7 +68,5 @@ namespace Cassowary
             // example output: weak:[0,0,1] {1} (23 + -1*[update.height:23]
             return string.Format("{0} {{{1}}} ({2}", Strength, Weight, Expression);
         }
-
-        private ClStrength _strength;
     }
 }

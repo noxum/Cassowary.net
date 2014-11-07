@@ -37,10 +37,12 @@ namespace Cassowary
             }
         }
 
-        public enum Operator : byte
+        public enum Operator
         {
             GreaterThanOrEqualTo = 1,
-            LessThanOrEqualTo = 2
+            LessThanOrEqualTo = 2,
+            GreaterThan = 3,
+            LessThan = 4
         }
 
         public static ClLinearExpression Plus(ClLinearExpression e1, ClLinearExpression e2)
@@ -139,23 +141,7 @@ namespace Cassowary
         public static bool Approx(double a, double b)
         {
             const double epsilon = 1.0e-8;
-
-            // ReSharper disable CompareOfFloatsByEqualityOperator
-            if (a == 0.0)
-                // ReSharper restore CompareOfFloatsByEqualityOperator
-            {
-                return (Math.Abs(b) < epsilon);
-            }
-                // ReSharper disable CompareOfFloatsByEqualityOperator
-            else if (b == 0.0)
-                // ReSharper restore CompareOfFloatsByEqualityOperator
-            {
-                return (Math.Abs(a) < epsilon);
-            }
-            else
-            {
-                return (Math.Abs(a - b) < Math.Abs(a) * epsilon);
-            }
+            return Math.Abs(a - b) < epsilon;
         }
 
         public static bool Approx(ClVariable clv, double b)
