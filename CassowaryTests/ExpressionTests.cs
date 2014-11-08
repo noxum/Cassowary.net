@@ -1,4 +1,5 @@
-﻿using Cassowary;
+﻿using System.Linq;
+using Cassowary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
@@ -162,7 +163,7 @@ namespace CassowaryTests
         }
 
         [TestMethod]
-        public void TwoParameterGreaterThanOrEqualToExpressionRuntimeVars()
+        public void GreaterThanOrEqualToConstraint_ResolvesToAllowableValue()
         {
             ClVariable varA = new ClVariable("a");
             ClVariable varB = new ClVariable("b");
@@ -172,10 +173,18 @@ namespace CassowaryTests
         }
 
         [TestMethod]
-        public void TwoParameterLessThanOrEqualToExpression()
+        public void LessThanOrEqualToConstraint_ResolvesToAllowableValue()
         {
             _solver.AddConstraint((a, b) => a <= b);
             Assert.IsTrue(((ClVariable)_solver.GetVariable("a")).Value <= ((ClVariable)_solver.GetVariable("b")).Value);
+        }
+
+        [TestMethod]
+        public void RangedConstraint_ResolvesToAllowableValue()
+        {
+            var vars = _solver.AddConstraint((a, b, c) => a <= b && b <= c).Cast<ClVariable>();
+
+            Assert.IsTrue(vars.Single(a => a.Name == "a").Value <= vars.Single(a => a.Name == "b").Value && vars.Single(a => a.Name == "b").Value <= vars.Single(a => a.Name == "c").Value);
         }
 
         [TestMethod]
@@ -226,12 +235,12 @@ namespace CassowaryTests
         [TestMethod]
         public void MultiParameterAndConstraints()
         {
-            _solver.AddConstraint((a, b, c, d) => a >= b && b >= c && c >= d && d * 2 + 3 - a <= 20);
+            var vars = _solver.AddConstraint((a, b, c, d) => a >= b && b >= c && c >= d && d * 2 + 3 - a <= 20).Cast<ClVariable>();
 
-            var aa = ((ClVariable)_solver.GetVariable("a")).Value;
-            var bb = ((ClVariable)_solver.GetVariable("b")).Value;
-            var cc = ((ClVariable)_solver.GetVariable("c")).Value;
-            var dd = ((ClVariable)_solver.GetVariable("d")).Value;
+            var aa = vars.Single(a => a.Name == "a").Value;
+            var bb = vars.Single(a => a.Name == "b").Value;
+            var cc = vars.Single(a => a.Name == "c").Value;
+            var dd = vars.Single(a => a.Name == "d").Value;
 
             Assert.IsTrue(aa >= bb);
             Assert.IsTrue(bb >= cc);

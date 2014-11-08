@@ -153,12 +153,12 @@ namespace Cassowary
         {
             double sum = 0;
             double factor = 1;
-            const double multiplier = 1000;
+            const double MULTIPLIER = 1000;
 
             for (var i = _values.Count - 1; i >= 0; i--)
             {
                 sum += _values[i] * factor;
-                factor *= multiplier;
+                factor *= MULTIPLIER;
             }
 
             return sum;

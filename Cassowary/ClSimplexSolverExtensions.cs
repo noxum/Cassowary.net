@@ -17,10 +17,10 @@ namespace Cassowary
             return AddConstraint(solver, constraint.Parameters, constraint.Body, strength);
         }
 
-        public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, Expression<Func<double, bool>> constraint, ClStrength strength = null)
+        public static void AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, Expression<Func<double, bool>> constraint, ClStrength strength = null)
         {
             Dictionary<string, ClAbstractVariable> variables = ConstructVariables(constraint.Parameters, a);
-            return AddConstraint(solver, variables, constraint.Body, strength);
+            AddConstraint(solver, variables, constraint.Body, strength);
         }
 
         public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, bool>> constraint, ClStrength strength = null)
@@ -28,10 +28,10 @@ namespace Cassowary
             return AddConstraint(solver, constraint.Parameters, constraint.Body, strength);
         }
 
-        public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, ClAbstractVariable b, Expression<Func<double, double, bool>> constraint, ClStrength strength = null)
+        public static void AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, ClAbstractVariable b, Expression<Func<double, double, bool>> constraint, ClStrength strength = null)
         {
             Dictionary<string, ClAbstractVariable> variables = ConstructVariables(constraint.Parameters, a, b);
-            return AddConstraint(solver, variables, constraint.Body, strength);
+            AddConstraint(solver, variables, constraint.Body, strength);
         }
 
         public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, double, bool>> constraint, ClStrength strength = null)
@@ -39,10 +39,10 @@ namespace Cassowary
             return AddConstraint(solver, constraint.Parameters, constraint.Body, strength);
         }
 
-        public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, ClAbstractVariable b, ClAbstractVariable c, Expression<Func<double, double, double, bool>> constraint, ClStrength strength = null)
+        public static void AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, ClAbstractVariable b, ClAbstractVariable c, Expression<Func<double, double, double, bool>> constraint, ClStrength strength = null)
         {
             Dictionary<string, ClAbstractVariable> variables = ConstructVariables(constraint.Parameters, a, b, c);
-            return AddConstraint(solver, variables, constraint.Body, strength);
+            AddConstraint(solver, variables, constraint.Body, strength);
         }
 
         public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, double, double, bool>> constraint, ClStrength strength = null)
@@ -50,10 +50,10 @@ namespace Cassowary
             return AddConstraint(solver, constraint.Parameters, constraint.Body, strength);
         }
 
-        public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, ClAbstractVariable b, ClAbstractVariable c, ClAbstractVariable d, Expression<Func<double, double, double, double, bool>> constraint, ClStrength strength = null)
+        public static void AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, ClAbstractVariable b, ClAbstractVariable c, ClAbstractVariable d, Expression<Func<double, double, double, double, bool>> constraint, ClStrength strength = null)
         {
             Dictionary<string, ClAbstractVariable> variables = ConstructVariables(constraint.Parameters, a, b, c, d);
-            return AddConstraint(solver, variables, constraint.Body, strength);
+            AddConstraint(solver, variables, constraint.Body, strength);
         }
 
 
@@ -61,16 +61,16 @@ namespace Cassowary
         {
             Dictionary<string, ClAbstractVariable> variables = parameters.Select(a => solver.GetVariable(a.Name) ?? new ClVariable(a.Name)).ToDictionary(a => a.Name);
 
-            return AddConstraint(solver, variables, body, strength);
+            AddConstraint(solver, variables, body, strength);
+
+            return variables.Values;
         }
 
-        private static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, Dictionary<string, ClAbstractVariable> variables, Expression body, ClStrength strength)
+        private static void AddConstraint(this ClSimplexSolver solver, Dictionary<string, ClAbstractVariable> variables, Expression body, ClStrength strength)
         {
             var constraints = FromExpression(variables, body, strength ?? _defaultStrength);
             foreach (var c in constraints)
                 solver.AddConstraint(c);
-
-            return variables.Values;
         }
 
         private static Dictionary<string, ClAbstractVariable> ConstructVariables(ReadOnlyCollection<ParameterExpression> parameters, params ClAbstractVariable[] variables)
@@ -78,7 +78,8 @@ namespace Cassowary
             if (variables.Length != parameters.Count)
                 throw new ArgumentException(string.Format("Expected {0} parameters, found {1}", parameters.Count, variables.Length));
 
-            return parameters.Select((p, i) => new {name = p.Name, variable = variables[i]}).ToDictionary(a => a.name, a => a.variable);
+            return parameters.Select((p, i) => new {name = p.Name, variable = variables[i]})
+                .ToDictionary(a => a.name, a => a.variable);
         }
         #endregion
 

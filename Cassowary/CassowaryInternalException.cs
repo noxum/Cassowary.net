@@ -24,7 +24,7 @@ using System;
 namespace Cassowary
 {
     [Serializable]
-    public class CassowaryInternalException : CassowaryException
+    internal class CassowaryInternalException : CassowaryException
     {
         public CassowaryInternalException(string s)
             : base(s)

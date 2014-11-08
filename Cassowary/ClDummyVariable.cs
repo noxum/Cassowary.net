@@ -23,15 +23,6 @@ namespace Cassowary
 {
     internal class ClDummyVariable : ClAbstractVariable
     {
-        public ClDummyVariable(string name)
-            : base(name)
-        {
-        }
-
-        public ClDummyVariable()
-        {
-        }
-
         public ClDummyVariable(long number, string prefix)
             : base(number, prefix)
         {
@@ -39,7 +30,7 @@ namespace Cassowary
 
         public override string ToString()
         {
-            return "[" + Name + ":dummy]";
+            return string.Format("[{0}:dummy]", Name);
         }
 
         public override bool IsDummy

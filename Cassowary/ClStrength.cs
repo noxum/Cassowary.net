@@ -45,7 +45,10 @@ namespace Cassowary
 
         public override string ToString()
         {
-            return string.Format("{0}:{1}", Name, IsRequired ? "Required" : SymbolicWeight.ToString());
+            if (IsRequired)
+                return Name;
+            else
+                return string.Format("{0}:{1}", Name, SymbolicWeight.ToString());
         }
 
         public static ClStrength Required

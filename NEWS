@@ -1,3 +1,7 @@
+3.0.0 -- 2014-11-08:
+  * Added support for < and > operators in constraints
+  * More code cleanup
+  
 1.0.0 -- 2014-03-26:
   * Migrated to .NET 3.5 (client framework)
   * Removed compact .NET version

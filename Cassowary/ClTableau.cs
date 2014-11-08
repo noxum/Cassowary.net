@@ -35,8 +35,8 @@ namespace Cassowary
             _columns = new Dictionary<ClAbstractVariable, HashSet<ClAbstractVariable>>();
             _rows = new Dictionary<ClAbstractVariable, ClLinearExpression>();
             InfeasibleRows = new HashSet<ClAbstractVariable>();
-            ExternalRows = new HashSet<ClAbstractVariable>();
-            ExternalParametricVars = new HashSet<ClAbstractVariable>();
+            ExternalRows = new HashSet<ClVariable>();
+            ExternalParametricVars = new HashSet<ClVariable>();
         }
 
         /// <summary>
@@ -117,13 +117,13 @@ namespace Cassowary
 
                 if (clv.IsExternal)
                 {
-                    ExternalParametricVars.Add(clv);
+                    ExternalParametricVars.Add((ClVariable)clv);
                 }
             }
 
             if (var.IsExternal)
             {
-                ExternalRows.Add(var);
+                ExternalRows.Add((ClVariable)var);
             }
         }
 
@@ -146,8 +146,8 @@ namespace Cassowary
 
             if (var.IsExternal)
             {
-                ExternalRows.Remove(var);
-                ExternalParametricVars.Remove(var);
+                ExternalRows.Remove((ClVariable)var);
+                ExternalParametricVars.Remove((ClVariable)var);
             }
         }
 
@@ -172,7 +172,7 @@ namespace Cassowary
 
             if (var.IsExternal)
             {
-                ExternalRows.Remove(var);
+                ExternalRows.Remove((ClVariable)var);
             }
 
             _rows.Remove(var);
@@ -199,8 +199,8 @@ namespace Cassowary
 
             if (oldVar.IsExternal)
             {
-                ExternalRows.Add(oldVar);
-                ExternalParametricVars.Remove(oldVar);
+                ExternalRows.Add((ClVariable)oldVar);
+                ExternalParametricVars.Remove((ClVariable)oldVar);
             }
 
             _columns.Remove(oldVar);
@@ -255,12 +255,12 @@ namespace Cassowary
         /// Set of rows where the basic variable is external
         /// this was added to the Java/C++/C# versions to reduce time in SetExternalVariables().
         /// </summary>
-        protected readonly HashSet<ClAbstractVariable> ExternalRows; // Set of ClVariable-s
+        protected readonly HashSet<ClVariable> ExternalRows;
 
         /// <summary>
         /// Set of external variables which are parametric
         /// this was added to the Java/C++/C# versions to reduce time in SetExternalVariables().
         /// </summary>
-        protected readonly HashSet<ClAbstractVariable> ExternalParametricVars; // Set of ClVariable-s
+        protected readonly HashSet<ClVariable> ExternalParametricVars;
     }
 }
