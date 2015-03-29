@@ -1006,21 +1006,20 @@ namespace Cassowary
             while (true)
             {
                 double objectiveCoeff = 0;
-                var terms = zRow.Terms;
-                foreach (ClAbstractVariable v in terms.Keys)
+                foreach (var kvp in zRow.Terms)
                 {
-                    double c = (terms[v]).Value;
-                    if (v.IsPivotable && c < objectiveCoeff)
+                    if (kvp.Key.IsPivotable && kvp.Value.Value < objectiveCoeff)
                     {
-                        objectiveCoeff = c;
-                        entryVar = v;
+                        objectiveCoeff = kvp.Value.Value;
+                        entryVar = kvp.Key;
                     }
                 }
+
                 if (objectiveCoeff >= -EPSILON || entryVar == null)
                     return;
+
                 double minRatio = Double.MaxValue;
-                var columnVars = Columns[entryVar];
-                foreach (ClAbstractVariable v in columnVars)
+                foreach (ClAbstractVariable v in Columns[entryVar])
                 {
                     if (v.IsPivotable)
                     {
@@ -1167,8 +1166,7 @@ namespace Cassowary
         /// We could for example make entryVar a basic variable and
         /// make exitVar a parametric variable.
         /// </remarks>
-        protected void Pivot(ClAbstractVariable entryVar,
-            ClAbstractVariable exitVar)
+        protected void Pivot(ClAbstractVariable entryVar, ClAbstractVariable exitVar)
             /* throws ExClInternalError */
         {
             // the entryVar might be non-pivotable if we're doing a 
@@ -1230,12 +1228,9 @@ namespace Cassowary
             foreach (var v in ExternalParametricVars)
             {
                 if (RowExpression(v) != null)
-                {
-                    Console.Error.WriteLine("Error: variable " + v +
-                                            "in _externalParametricVars is basic");
-                    continue;
-                }
-                v.Value = 0.0;
+                    Console.Error.WriteLine(string.Format("Error: variable {0} in _externalParametricVars is basic", v));
+                else
+                    v.Value = 0.0;
             }
 
             foreach (var v in ExternalRows)
