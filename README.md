@@ -24,7 +24,7 @@ Of course, it may not be convenient to include your variable names directly in y
 
     solver.AddConstraint((buttonLeft, buttonRight, windowLeft, windowRight) => buttonLeft == windowLeft && buttonRight == windowRight || buttonRight > 100);
     
-...it becomes very long and tiresome. To solver this problem you can pass in your variable objects directly, and then bind them to temporary names:
+...it becomes very long and tiresome. To solve this problem you can pass in your variable objects directly, and then bind them to temporary names:
 
     var buttonLeft = new ClVariable("buttonLeft");
     var buttonRight = new ClVariable("buttonRight");
