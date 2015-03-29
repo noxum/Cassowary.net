@@ -34,5 +34,5 @@ Of course, it may not be convenient to include your variable names directly in y
     solver.AddConstraint(
         buttonLeft, buttonRight, windowLeft, windowRight        // Pass in the variables here
         (bl, br, wl, wr) =>                                     // Bind them to temporary names in this expression
-         => bl == wl && br == wr || br > 100);                  // Define the constraints, using the temporary names
+        bl == wl && br == wr || br > 100);                  // Define the constraints, using the temporary names
     );
