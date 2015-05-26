@@ -19,6 +19,8 @@
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
+using System.Collections.Generic;
+
 namespace Cassowary
 {
     public class ClPoint
@@ -60,6 +62,62 @@ namespace Cassowary
         public override string ToString()
         {
             return "(" + _clvX + ", " + _clvY + ")";
+        }
+    }
+
+    public static class CassowarySimplexSolverPointExtensions
+    {
+        /// <summary>
+        /// Add weak stays to the x and y parts of each point. These
+        /// have increasing weights so that the solver will try to satisfy
+        /// the x and y stays on the same point, rather than the x stay on
+        /// one and the y stay on another.
+        /// <param name="points">
+        /// List of points to add weak stay constraints for.
+        /// </param>
+        /// </summary>
+        public static ClSimplexSolver AddPointStays(this ClSimplexSolver solver, IEnumerable<ClPoint> points)
+        {
+            double weight = 1.0;
+            const double MULTIPLIER = 2.0;
+
+            foreach (ClPoint p in points)
+            {
+                solver.AddPointStay(p, weight);
+                weight *= MULTIPLIER;
+            }
+
+            return solver;
+        }
+
+        public static ClSimplexSolver AddPointStay(this ClSimplexSolver solver, ClVariable vx, ClVariable vy, double weight)
+        {
+            solver.AddStay(vx, ClStrength.Weak, weight);
+            solver.AddStay(vy, ClStrength.Weak, weight);
+
+            return solver;
+        }
+
+        public static ClSimplexSolver AddPointStay(this ClSimplexSolver solver, ClVariable vx, ClVariable vy)
+        {
+            solver.AddPointStay(vx, vy, 1.0);
+
+            return solver;
+        }
+
+        public static ClSimplexSolver AddPointStay(this ClSimplexSolver solver, ClPoint clp, double weight)
+        {
+            solver.AddStay(clp.X, ClStrength.Weak, weight);
+            solver.AddStay(clp.Y, ClStrength.Weak, weight);
+
+            return solver;
+        }
+
+        public static ClSimplexSolver AddPointStay(this ClSimplexSolver solver, ClPoint clp)
+        {
+            solver.AddPointStay(clp, 1.0);
+
+            return solver;
         }
     }
 }

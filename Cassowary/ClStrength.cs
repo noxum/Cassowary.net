@@ -48,7 +48,7 @@ namespace Cassowary
             if (IsRequired)
                 return Name;
             else
-                return string.Format("{0}:{1}", Name, SymbolicWeight.ToString());
+                return string.Format("{0}:{1}", Name, SymbolicWeight);
         }
 
         public static ClStrength Required

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Cassowary;
+﻿using Cassowary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
@@ -182,9 +181,13 @@ namespace CassowaryTests
         [TestMethod]
         public void RangedConstraint_ResolvesToAllowableValue()
         {
-            var vars = _solver.AddConstraint((a, b, c) => a <= b && b <= c).Cast<ClVariable>();
+            _solver.AddConstraint((a, b, c) => a <= b && b <= c);
 
-            Assert.IsTrue(vars.Single(a => a.Name == "a").Value <= vars.Single(a => a.Name == "b").Value && vars.Single(a => a.Name == "b").Value <= vars.Single(a => a.Name == "c").Value);
+            var aa = (ClVariable)_solver.GetVariable("a");
+            var bb = (ClVariable)_solver.GetVariable("b");
+            var cc = (ClVariable)_solver.GetVariable("c");
+
+            Assert.IsTrue(aa.Value <= bb.Value && bb.Value <= cc.Value);
         }
 
         [TestMethod]
@@ -235,12 +238,12 @@ namespace CassowaryTests
         [TestMethod]
         public void MultiParameterAndConstraints()
         {
-            var vars = _solver.AddConstraint((a, b, c, d) => a >= b && b >= c && c >= d && d * 2 + 3 - a <= 20).Cast<ClVariable>();
+            _solver.AddConstraint((a, b, c, d) => a >= b && b >= c && c >= d && d * 2 + 3 - a <= 20);
 
-            var aa = vars.Single(a => a.Name == "a").Value;
-            var bb = vars.Single(a => a.Name == "b").Value;
-            var cc = vars.Single(a => a.Name == "c").Value;
-            var dd = vars.Single(a => a.Name == "d").Value;
+            var aa = ((ClVariable)_solver.GetVariable("a")).Value;
+            var bb = ((ClVariable)_solver.GetVariable("b")).Value;
+            var cc = ((ClVariable)_solver.GetVariable("c")).Value;
+            var dd = ((ClVariable)_solver.GetVariable("d")).Value;
 
             Assert.IsTrue(aa >= bb);
             Assert.IsTrue(bb >= cc);

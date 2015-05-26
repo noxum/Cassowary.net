@@ -41,15 +41,10 @@ namespace Cassowary
             Value = value;
         }
 
-        public ClVariable(long number, string prefix, double value)
+        public ClVariable(long number, string prefix, double value = 0.0)
             : base(number, prefix)
         {
             Value = value;
-        }
-
-        public ClVariable(long number, string prefix)
-            : this(number, prefix, 0.0)
-        {
         }
 
         public override bool IsDummy

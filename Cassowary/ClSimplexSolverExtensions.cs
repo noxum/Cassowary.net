@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -11,69 +10,68 @@ namespace Cassowary
     {
         private static readonly ClStrength _defaultStrength = ClStrength.Required;
 
-        #region add
-        public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, Expression<Func<double, bool>> constraint, ClStrength strength = null)
+        #region add expression constraint
+        public static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, Expression<Func<double, bool>> constraint, ClStrength strength = null)
         {
             return AddConstraint(solver, constraint.Parameters, constraint.Body, strength);
         }
 
-        public static void AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, Expression<Func<double, bool>> constraint, ClStrength strength = null)
+        public static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, Expression<Func<double, bool>> constraint, ClStrength strength = null)
         {
             Dictionary<string, ClAbstractVariable> variables = ConstructVariables(constraint.Parameters, a);
-            AddConstraint(solver, variables, constraint.Body, strength);
+            return AddConstraint(solver, variables, constraint.Body, strength);
         }
 
-        public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, bool>> constraint, ClStrength strength = null)
+        public static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, bool>> constraint, ClStrength strength = null)
         {
             return AddConstraint(solver, constraint.Parameters, constraint.Body, strength);
         }
 
-        public static void AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, ClAbstractVariable b, Expression<Func<double, double, bool>> constraint, ClStrength strength = null)
+        public static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, ClAbstractVariable b, Expression<Func<double, double, bool>> constraint, ClStrength strength = null)
         {
             Dictionary<string, ClAbstractVariable> variables = ConstructVariables(constraint.Parameters, a, b);
-            AddConstraint(solver, variables, constraint.Body, strength);
+            return AddConstraint(solver, variables, constraint.Body, strength);
         }
 
-        public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, double, bool>> constraint, ClStrength strength = null)
+        public static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, double, bool>> constraint, ClStrength strength = null)
         {
             return AddConstraint(solver, constraint.Parameters, constraint.Body, strength);
         }
 
-        public static void AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, ClAbstractVariable b, ClAbstractVariable c, Expression<Func<double, double, double, bool>> constraint, ClStrength strength = null)
+        public static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, ClAbstractVariable b, ClAbstractVariable c, Expression<Func<double, double, double, bool>> constraint, ClStrength strength = null)
         {
             Dictionary<string, ClAbstractVariable> variables = ConstructVariables(constraint.Parameters, a, b, c);
-            AddConstraint(solver, variables, constraint.Body, strength);
+            return AddConstraint(solver, variables, constraint.Body, strength);
         }
 
-        public static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, double, double, bool>> constraint, ClStrength strength = null)
+        public static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, Expression<Func<double, double, double, double, bool>> constraint, ClStrength strength = null)
         {
             return AddConstraint(solver, constraint.Parameters, constraint.Body, strength);
         }
 
-        public static void AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, ClAbstractVariable b, ClAbstractVariable c, ClAbstractVariable d, Expression<Func<double, double, double, double, bool>> constraint, ClStrength strength = null)
+        public static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, ClAbstractVariable a, ClAbstractVariable b, ClAbstractVariable c, ClAbstractVariable d, Expression<Func<double, double, double, double, bool>> constraint, ClStrength strength = null)
         {
             Dictionary<string, ClAbstractVariable> variables = ConstructVariables(constraint.Parameters, a, b, c, d);
-            AddConstraint(solver, variables, constraint.Body, strength);
+            return AddConstraint(solver, variables, constraint.Body, strength);
         }
 
 
-        private static IEnumerable<ClAbstractVariable> AddConstraint(this ClSimplexSolver solver, IEnumerable<ParameterExpression> parameters, Expression body, ClStrength strength)
+        private static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, IEnumerable<ParameterExpression> parameters, Expression body, ClStrength strength)
         {
             Dictionary<string, ClAbstractVariable> variables = parameters.Select(a => solver.GetVariable(a.Name) ?? new ClVariable(a.Name)).ToDictionary(a => a.Name);
-
-            AddConstraint(solver, variables, body, strength);
-
-            return variables.Values;
+            return AddConstraint(solver, variables, body, strength);
         }
 
-        private static void AddConstraint(this ClSimplexSolver solver, Dictionary<string, ClAbstractVariable> variables, Expression body, ClStrength strength)
+        private static ClSimplexSolver AddConstraint(this ClSimplexSolver solver, IDictionary<string, ClAbstractVariable> variables, Expression body, ClStrength strength)
         {
             var constraints = FromExpression(variables, body, strength ?? _defaultStrength);
             foreach (var c in constraints)
                 solver.AddConstraint(c);
+
+            return solver;
         }
 
-        private static Dictionary<string, ClAbstractVariable> ConstructVariables(ReadOnlyCollection<ParameterExpression> parameters, params ClAbstractVariable[] variables)
+        private static Dictionary<string, ClAbstractVariable> ConstructVariables(ICollection<ParameterExpression> parameters, params ClAbstractVariable[] variables)
         {
             if (variables.Length != parameters.Count)
                 throw new ArgumentException(string.Format("Expected {0} parameters, found {1}", parameters.Count, variables.Length));

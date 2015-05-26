@@ -21,7 +21,6 @@ namespace CassowaryTests
         {
             var x = new ClVariable("x");
             _solver.AddConstraint(x, a => a < -1);
-            _solver.Resolve();
 
             Assert.IsTrue(x.Value < -1);
         }
@@ -182,15 +181,13 @@ namespace CassowaryTests
             var h = new ClVariable("h");
 
 
-            _solver
+            var e1 = _solver
                 .AddStay(x)
                 .AddStay(y)
                 .AddStay(w)
                 .AddStay(h)
 
-                .AddEditVar(x)
-                .AddEditVar(y)
-                .BeginEdit()
+                .BeginEdit(x, y)
 
                 .SuggestValue(x, 10)
                 .SuggestValue(y, 20)
@@ -202,11 +199,7 @@ namespace CassowaryTests
             Assert.IsTrue(Cl.Approx(h, 0));
 
             _solver
-                .AddEditVar(w)
-                .AddEditVar(h)
-                .BeginEdit();
-
-            _solver
+                .BeginEdit(w, h)
                 .SuggestValue(w, 30)
                 .SuggestValue(h, 40)
                 .EndEdit();
@@ -216,7 +209,7 @@ namespace CassowaryTests
             Assert.IsTrue(Cl.Approx(w, 30));
             Assert.IsTrue(Cl.Approx(h, 40));
 
-            _solver
+            e1
                 .SuggestValue(x, 50)
                 .SuggestValue(y, 60)
                 .EndEdit();
@@ -339,11 +332,11 @@ namespace CassowaryTests
             Console.WriteLine("time = " + timer.Elapsed + "\n");
             timer.Start();
 
-            for (var m = 0; m < nResolves; m++)
-            {
-                _solver.Resolve(rgpclv[e1Index].Value * 1.001,
-                               rgpclv[e2Index].Value * 1.001);
-            }
+            //for (var m = 0; m < nResolves; m++)
+            //{
+            //    _solver.Resolve(rgpclv[e1Index].Value * 1.001,
+            //                   rgpclv[e2Index].Value * 1.001);
+            //}
 
             Console.WriteLine("done resolves -- now removing constraints");
             Console.WriteLine("time = " + timer.Elapsed + "\n");

@@ -25,7 +25,7 @@ using System.Linq;
 
 namespace Cassowary
 {
-    public class ClSimplexSolver : ClTableau
+    public class ClSimplexSolver : ClTableau, IEditContext
     {
         /// <remarks>
         /// Constructor initializes the fields, and creaties the objective row.
@@ -36,44 +36,12 @@ namespace Cassowary
         }
 
         /// <summary>
-        /// Convenience function for creating a linear inequality constraint.
-        /// </summary>
-        public ClSimplexSolver AddLowerBound(ClAbstractVariable v, double lower)
-            /* throws ExClRequiredFailure, ExClInternalError */
-        {
-            ClLinearInequality cn = new ClLinearInequality(v, Operator.GreaterThanOrEqualTo, new ClLinearExpression(lower));
-            return AddConstraint(cn);
-        }
-
-        /// <summary>
-        /// Convenience function for creating a linear inequality constraint.
-        /// </summary>
-        public ClSimplexSolver AddUpperBound(ClAbstractVariable v, double upper)
-            /* throws ExClRequiredFailure, ExClInternalError */
-        {
-            ClLinearInequality cn = new ClLinearInequality(v, Operator.LessThanOrEqualTo, new ClLinearExpression(upper));
-            return AddConstraint(cn);
-        }
-
-        /// <summary>
-        /// Convenience function for creating a pair of linear inequality constraints.
-        /// </summary>
-        public ClSimplexSolver AddBounds(ClAbstractVariable v, double lower, double upper)
-            /* throws ExClRequiredFailure, ExClInternalError */
-        {
-            AddLowerBound(v, lower);
-            AddUpperBound(v, upper);
-            return this;
-        }
-
-        /// <summary>
         /// Add a constraint to the solver.
         /// <param name="cn">
         /// The constraint to be added.
         /// </param>
         /// </summary>
         public ClSimplexSolver AddConstraint(ClConstraint cn)
-            /* throws ExClRequiredFailure, ExClInternalError */
         {
             List<ClAbstractVariable> eplusEminus = new List<ClAbstractVariable>(2);
             ClDouble prevEConstant = new ClDouble();
@@ -117,7 +85,7 @@ namespace Cassowary
         /// False if the constraint resulted in an unsolvable system, otherwise true.
         /// </returns>
         /// </summary>
-        public bool AddConstraintNoException(ClConstraint cn)
+        public bool TryAddConstraint(ClConstraint cn)
         {
             try
             {
@@ -130,18 +98,17 @@ namespace Cassowary
             }
         }
 
+        #region editing
         /// <summary>
         /// Add an edit constraint for a variable with a given strength.
         /// <param name="v">Variable to add an edit constraint to.</param>
         /// <param name="strength">Strength of the edit constraint.</param>
         /// </summary>
-        public ClSimplexSolver AddEditVar(ClVariable v, ClStrength strength)
-            /* throws ExClInternalError */
+        private void AddEditVar(ClVariable v, ClStrength strength)
         {
             try
             {
-                ClEditConstraint cnEdit = new ClEditConstraint(v, strength);
-                return AddConstraint(cnEdit);
+                AddConstraint(new ClEditConstraint(v, strength));
             }
             catch (CassowaryRequiredFailureException)
             {
@@ -150,27 +117,15 @@ namespace Cassowary
             }
         }
 
-        /// <remarks>
-        /// Add an edit constraint with strength ClStrength#Strong.
-        /// </remarks>
-        public ClSimplexSolver AddEditVar(ClVariable v)
-        {
-            /* throws ExClInternalError */
-            return AddEditVar(v, ClStrength.Strong);
-        }
-
         /// <summary>
         /// Remove the edit constraint previously added.
         /// <param name="v">Variable to which the edit constraint was added before.</param>
         /// </summary>
-        public ClSimplexSolver RemoveEditVar(ClVariable v)
-            /* throws ExClInternalError, ExClConstraintNotFound */
+        private void RemoveEditVar(ClVariable v)
         {
             ClEditInfo cei = _editVarMap[v];
             ClConstraint cn = cei.Constraint;
             RemoveConstraint(cn);
-
-            return this;
         }
 
         /// <summary>
@@ -180,9 +135,11 @@ namespace Cassowary
         /// BeginEdit should be called before sending Resolve()
         /// messages, after adding the appropriate edit variables.
         /// </remarks>
-        public ClSimplexSolver BeginEdit()
-            /* throws ExClInternalError */
+        public IEditContext BeginEdit(params ClVariable[] editVar)
         {
+            foreach (ClVariable variable in editVar)
+                AddEditVar(variable, ClStrength.Strong);
+
             Assert(_editVarMap.Count > 0, "_editVarMap.Count > 0");
             // may later want to do more in here
             InfeasibleRows.Clear();
@@ -199,11 +156,10 @@ namespace Cassowary
         /// EndEdit should be called after editing has finished for now, it
         /// just removes all edit variables.
         /// </remarks>
-        public ClSimplexSolver EndEdit()
-            /* throws ExClInternalError */
+        ClSimplexSolver IEditContext.EndEdit()
         {
             Assert(_editVarMap.Count > 0, "_editVarMap.Count > 0");
-            Resolve();
+            ((IEditContext)this).Resolve();
             _stkCedcns.Pop();
             int n = _stkCedcns.Peek();
             RemoveEditVarsTo(n);
@@ -213,44 +169,19 @@ namespace Cassowary
         }
 
         /// <summary>
-        /// Eliminates all the edit constraints that were added.
-        /// </summary>
-        public ClSimplexSolver RemoveAllEditVars(int n)
-            /* throws ExClInternalError */
-        {
-            return RemoveEditVarsTo(0);
-        }
-
-        /// <summary>
         /// Remove the last added edit vars to leave only
         /// a specific number left.
         /// <param name="n">
         /// Number of edit variables to keep.
         /// </param>
         /// </summary>
-        public ClSimplexSolver RemoveEditVarsTo(int n)
-            /* throws ExClInternalError */
+        private void RemoveEditVarsTo(int n)
         {
-            // HACK: to be able to remove elements from _editVarMap,
-            // which will be done by RemoveEditVar(...).
-            //
-            // C# enumerators do not allow this, because they
-            // only take a snapshot of the collection. If the collection
-            // changes (by removing an element for example), the
-            // enumerator gets out of sync, and an 
-            // InvalidOperationException will be thrown. 
-            // 
-            // We thus create a copy of the _editVarMap to iterate
-            // through.
-            var editVarMapCopy = _editVarMap.ToArray();
-
             try
             {
-                foreach (var kvp in editVarMapCopy.Where(a => a.Value.Index >= n))
+                foreach (var kvp in _editVarMap.Where(a => a.Value.Index >= n).ToArray())
                     RemoveEditVar(kvp.Key);
                 Assert(_editVarMap.Count == n, "_editVarMap.Count == n");
-
-                return this;
             }
             catch (CassowaryConstraintNotFoundException)
             {
@@ -260,65 +191,45 @@ namespace Cassowary
         }
 
         /// <summary>
-        /// Add weak stays to the x and y parts of each point. These
-        /// have increasing weights so that the solver will try to satisfy
-        /// the x and y stays on the same point, rather than the x stay on
-        /// one and the y stay on another.
-        /// <param name="listOfPoints">
-        /// List of points to add weak stay constraints for.
-        /// </param>
+        /// Re-solve the current collection of constraints, given the new
+        /// values for the edit variables that have already been
+        /// suggested (see <see cref="IEditContext.SuggestValue"/> method).
         /// </summary>
-        public ClSimplexSolver AddPointStays(IEnumerable<ClPoint> listOfPoints)
-            /* throws ExClRequiredFailure, ExClInternalError */
+        IEditContext IEditContext.Resolve()
         {
-            double weight = 1.0;
-            const double MULTIPLIER = 2.0;
+            DualOptimize();
+            SetExternalVariables();
+            InfeasibleRows.Clear();
+            ResetStayConstants();
 
-            foreach (ClPoint p in listOfPoints)
+            return this;
+        }
+
+        /// <summary>
+        /// Suggest a new value for an edit variable. 
+        /// </summary>
+        /// <remarks>
+        /// The variable needs to be added as an edit variable and 
+        /// BeginEdit() needs to be called before this is called.
+        /// The tableau will not be solved completely until after Resolve()
+        /// has been called.
+        /// </remarks>
+        IEditContext IEditContext.SuggestValue(ClVariable v, double x)
+        {
+            ClEditInfo cei = _editVarMap[v];
+            if (cei == null)
             {
-                AddPointStay(p, weight);
-                weight *= MULTIPLIER;
+                throw new CassowaryException("SuggestValue for variable " + v + ", but var is not an edit variable\n");
             }
+            ClSlackVariable clvEditPlus = cei.ClvEditPlus;
+            ClSlackVariable clvEditMinus = cei.ClvEditMinus;
+            double delta = x - cei.PrevEditConstant;
+            cei.PrevEditConstant = x;
+            DeltaEditConstant(delta, clvEditPlus, clvEditMinus);
 
             return this;
         }
-
-        public ClSimplexSolver AddPointStay(ClVariable vx,
-            ClVariable vy,
-            double weight)
-            /* throws ExClRequiredFailure, ExClInternalError */
-        {
-            AddStay(vx, ClStrength.Weak, weight);
-            AddStay(vy, ClStrength.Weak, weight);
-
-            return this;
-        }
-
-        public ClSimplexSolver AddPointStay(ClVariable vx,
-            ClVariable vy)
-            /* throws ExClRequiredFailure, ExClInternalError */
-        {
-            AddPointStay(vx, vy, 1.0);
-
-            return this;
-        }
-
-        public ClSimplexSolver AddPointStay(ClPoint clp, double weight)
-            /* throws ExClRequiredFailure, ExClInternalError */
-        {
-            AddStay(clp.X, ClStrength.Weak, weight);
-            AddStay(clp.Y, ClStrength.Weak, weight);
-
-            return this;
-        }
-
-        public ClSimplexSolver AddPointStay(ClPoint clp)
-            /* throws ExClRequiredFailure, ExClInternalError */
-        {
-            AddPointStay(clp, 1.0);
-
-            return this;
-        }
+        #endregion
 
         /// <summary>
         /// Add a stay of the given strength (default to ClStrength#Weak)
@@ -327,9 +238,7 @@ namespace Cassowary
         /// Variable to add the stay constraint to.
         /// </param>
         /// </summary>
-        public ClSimplexSolver AddStay(ClVariable v,
-            ClStrength strength,
-            double weight)
+        public ClSimplexSolver AddStay(ClVariable v, ClStrength strength, double weight)
             /* throws ExClRequiredFailure, ExClInternalError */
         {
             ClStayConstraint cn = new ClStayConstraint(v, strength, weight);
@@ -340,8 +249,7 @@ namespace Cassowary
         /// <remarks>
         /// Default to weight 1.0.
         /// </remarks>
-        public ClSimplexSolver AddStay(ClVariable v,
-            ClStrength strength)
+        public ClSimplexSolver AddStay(ClVariable v, ClStrength strength)
             /* throws ExClRequiredFailure, ExClInternalError */
         {
             AddStay(v, strength, 1.0);
@@ -515,105 +423,6 @@ namespace Cassowary
         }
 
         /// <summary>
-        /// Re-initialize this solver from the original constraints, thus
-        /// getting rid of any accumulated numerical problems 
-        /// </summary>
-        /// <remarks>
-        /// Actually, we haven't definitely observed any such problems yet.
-        /// </remarks>
-        public void Reset()
-            /* throws ExClInternalError */
-        {
-            throw new CassowaryInternalException("Reset not implemented");
-        }
-
-        /// <summary>
-        /// Re-solve the current collection of constraints for new values
-        /// for the constants of the edit variables.
-        /// </summary>
-        /// <remarks>
-        /// Deprecated. Use SuggestValue(...) then Resolve(). If you must
-        /// use this, be sure to not use it if you
-        /// remove an edit variable (or edit constraints) from the middle
-        /// of a list of edits, and then try to resolve with this function
-        /// (you'll get the wrong answer, because the indices will be wrong
-        /// in the ClEditInfo objects).
-        /// </remarks>
-        public void Resolve(List<ClDouble> newEditConstants)
-            /* throws ExClInternalError */
-        {
-            foreach (ClVariable v in _editVarMap.Keys)
-            {
-                ClEditInfo cei = _editVarMap[v];
-                int i = cei.Index;
-                try
-                {
-                    if (i < newEditConstants.Count)
-                    {
-                        SuggestValue(v, (newEditConstants[i]).Value);
-                    }
-                }
-                catch (CassowaryException)
-                {
-                    throw new CassowaryInternalException("Error during resolve");
-                }
-            }
-            Resolve();
-        }
-
-        /// <summary>
-        /// Convenience function for resolve-s of two variables.
-        /// </summary>
-        public void Resolve(double x, double y)
-            /* throws ExClInternalError */
-        {
-            (_resolvePair[0]).Value = x;
-            (_resolvePair[1]).Value = y;
-
-            Resolve(_resolvePair);
-        }
-
-        /// <summary>
-        /// Re-solve the current collection of constraints, given the new
-        /// values for the edit variables that have already been
-        /// suggested (see <see cref="SuggestValue"/> method).
-        /// </summary>
-        public void Resolve()
-            /* throws ExClInternalError */
-        {
-            DualOptimize();
-            SetExternalVariables();
-            InfeasibleRows.Clear();
-            ResetStayConstants();
-        }
-
-        /// <summary>
-        /// Suggest a new value for an edit variable. 
-        /// </summary>
-        /// <remarks>
-        /// The variable needs to be added as an edit variable and 
-        /// BeginEdit() needs to be called before this is called.
-        /// The tableau will not be solved completely until after Resolve()
-        /// has been called.
-        /// </remarks>
-        public ClSimplexSolver SuggestValue(ClVariable v, double x)
-            /* throws ExClError */
-        {
-            ClEditInfo cei = _editVarMap[v];
-            if (cei == null)
-            {
-                throw new CassowaryException("SuggestValue for variable " + v + ", but var is not an edit variable\n");
-            }
-            ClSlackVariable clvEditPlus = cei.ClvEditPlus;
-            ClSlackVariable clvEditMinus = cei.ClvEditMinus;
-            double delta = x - cei.PrevEditConstant;
-            cei.PrevEditConstant = x;
-            DeltaEditConstant(delta, clvEditPlus, clvEditMinus);
-
-            return this;
-        }
-
-        /// <summary>
         /// Controls wether optimization and setting of external variables is done
         /// automatically or not.
         /// </summary>
@@ -633,40 +442,11 @@ namespace Cassowary
         }
 
         public ClSimplexSolver Solve()
-            /* throws ExClInternalError */
         {
             if (_cNeedsSolving)
             {
                 Optimize(_objective);
                 SetExternalVariables();
-            }
-
-            return this;
-        }
-
-        public ClSimplexSolver SetEditedValue(ClVariable v, double n)
-            /* throws ExClInternalError */
-        {
-            if (!ContainsVariable(v))
-            {
-                v.Value = n;
-                return this;
-            }
-
-            if (!Approx(n, v.Value))
-            {
-                AddEditVar(v);
-                BeginEdit();
-                try
-                {
-                    SuggestValue(v, n);
-                }
-                catch (CassowaryException)
-                {
-                    // just added it above, so we shouldn't get an error
-                    throw new CassowaryInternalException("Error in SetEditedValue");
-                }
-                EndEdit();
             }
 
             return this;
@@ -739,7 +519,7 @@ namespace Cassowary
         /// to the inequality tableau, then make av be 0 (raise an exception
         /// if we can't attain av=0).
         /// </remarks>
-        protected void AddWithArtificialVariable(ClLinearExpression expr)
+        private void AddWithArtificialVariable(ClLinearExpression expr)
             /* throws ExClRequiredFailure, ExClInternalError */
         {
             ClSlackVariable av = new ClSlackVariable(++_artificialCounter, "a");
@@ -795,7 +575,7 @@ namespace Cassowary
         /// <returns>
         /// True if successful and false if not.
         /// </returns>
-        protected bool TryAddingDirectly(ClLinearExpression expr)
+        private bool TryAddingDirectly(ClLinearExpression expr)
             /* throws ExClRequiredFailure */
         {
             ClAbstractVariable subject = ChooseSubject(expr);
@@ -828,7 +608,7 @@ namespace Cassowary
         /// (In this last case we have to add an artificial variable and use that
         /// variable as the subject -- this is done outside this method though.)
         /// </remarks>
-        protected ClAbstractVariable ChooseSubject(ClLinearExpression expr)
+        private ClAbstractVariable ChooseSubject(ClLinearExpression expr)
             /* ExClRequiredFailure */
         {
             ClAbstractVariable subject = null; // the current best subject, if any
@@ -904,8 +684,8 @@ namespace Cassowary
             return subject;
         }
 
-        protected ClLinearExpression NewExpression(ClConstraint cn,
-            List<ClAbstractVariable> eplusEminus,
+        private ClLinearExpression NewExpression(ClConstraint cn,
+            ICollection<ClAbstractVariable> eplusEminus,
             ClDouble prevEConstant)
         {
             ClLinearExpression cnExpr = cn.Expression;
@@ -928,7 +708,7 @@ namespace Cassowary
                 ClSlackVariable slackVar = new ClSlackVariable(_slackCounter, "s");
                 expr.SetVariable(slackVar, -1);
                 _markerVars.Add(cn, slackVar);
-                if (!cn.IsRequired)
+                if (!cn.Strength.IsRequired)
                 {
                     ++_slackCounter;
                     eminus = new ClSlackVariable(_slackCounter, "em");
@@ -943,7 +723,7 @@ namespace Cassowary
             else
             {
                 // cn is an equality
-                if (cn.IsRequired)
+                if (cn.Strength.IsRequired)
                 {
                     ++_dummyCounter;
                     ClDummyVariable dummyVar = new ClDummyVariable(_dummyCounter, "d");
@@ -994,7 +774,7 @@ namespace Cassowary
         /// <remarks>
         /// The tableau should already be feasible.
         /// </remarks>
-        protected void Optimize(ClObjectiveVariable zVar)
+        private void Optimize(ClObjectiveVariable zVar)
             /* throws ExClInternalError */
         {
             ClLinearExpression zRow = RowExpression(zVar);
@@ -1304,8 +1084,6 @@ namespace Cassowary
         private long _slackCounter = 0;
         private long _artificialCounter = 0;
         private long _dummyCounter = 0;
-
-        private readonly List<ClDouble> _resolvePair = new List<ClDouble>(2) { new ClDouble(0), new ClDouble(0) };
 
         private const double EPSILON = 1e-8;
 

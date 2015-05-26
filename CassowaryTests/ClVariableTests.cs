@@ -1,6 +1,4 @@
-﻿using System;
-using System.Globalization;
-using Cassowary;
+﻿using Cassowary;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CassowaryTests

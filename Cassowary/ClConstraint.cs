@@ -41,11 +41,6 @@ namespace Cassowary
             get { return false; }
         }
 
-        public virtual bool IsRequired
-        {
-            get { return _strength.IsRequired; }
-        }
-
         public virtual bool IsStayConstraint
         {
             get { return false; }

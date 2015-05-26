@@ -96,7 +96,7 @@ namespace Cassowary
             : base(cle2.Clone(), strength, weight)
         /* throws ExClInternalError */
         {
-            const double epsilon = 1e-8;
+            const double EPSILON = 1e-8;
 
             switch (op)
             {
@@ -105,14 +105,14 @@ namespace Cassowary
                     break;
                 case Cl.Operator.GreaterThan:
                     SetupGreaterThanOrEqualTo(cle1);
-                    ExpressionField.IncrementConstant(-epsilon);
+                    ExpressionField.IncrementConstant(-EPSILON);
                     break;
                 case Cl.Operator.LessThanOrEqualTo:
                     SetupLessThanOrEqualTo(cle1);
                     break;
                 case Cl.Operator.LessThan:
                     SetupLessThanOrEqualTo(cle1);
-                    ExpressionField.IncrementConstant(-epsilon);
+                    ExpressionField.IncrementConstant(-EPSILON);
                     break;
                 default:
                     // invalid operator

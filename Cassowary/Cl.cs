@@ -140,8 +140,8 @@ namespace Cassowary
 
         public static bool Approx(double a, double b)
         {
-            const double epsilon = 1.0e-8;
-            return Math.Abs(a - b) < epsilon;
+            const double EPSILON = 1.0e-8;
+            return Math.Abs(a - b) < EPSILON;
         }
 
         public static bool Approx(ClVariable clv, double b)
