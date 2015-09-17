@@ -1068,7 +1068,7 @@ namespace Cassowary
         /// </remarks>
         private readonly Dictionary<ClConstraint, ClAbstractVariable> _markerVars = new Dictionary<ClConstraint, ClAbstractVariable>();
 
-        private readonly ClObjectiveVariable _objective = new ClObjectiveVariable("Z");
+        private readonly ClObjectiveVariable _objective = new ClObjectiveVariable(Guid.NewGuid().ToString());
 
         /// <summary>
         /// Map edit variables to ClEditInfo-s.
