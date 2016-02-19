@@ -49,6 +49,7 @@
     <Compile Include="ClVariableTests.cs" />
     <Compile Include="ExpressionTests.cs" />
     <Compile Include="LayoutTests.cs" />
+    <Compile Include="Playground.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ClTests.cs" />
     <Compile Include="PythonExamples.cs" />

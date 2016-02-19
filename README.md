@@ -8,6 +8,10 @@ This fork of Cassowary.net initially began as a simple cleanup effort, refactori
 
 The easiest way to use this fork is from the [nuget](https://www.nuget.org/packages/Cassowary/) package manager.
 
+## Status
+
+I am not personally actively using this at the moment. I will accept PRs but I am unlikely to dedicate much time to fixing bugs. **I would recommend using the *far* more powerful [Z3](https://github.com/Z3Prover/z3) solver built by Microsoft instead**. In my tests Z3 has shown itself to be generally faster than Cassowary at solving linear problems, whilst having the capacity to solve non-linear problems when required.
+
 ## Composing Constraints
 
 Creating complex constraints is very easy using the expression based extensions to the system:
