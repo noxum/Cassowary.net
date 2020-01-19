@@ -29,5 +29,22 @@ namespace CassowaryTests
             editContext.SuggestValue(variable, EXPECTED_VALUE);
             editContext.EndEdit();
         }
+
+        /// <summary>
+        /// https://github.com/martindevans/Cassowary.net/issues/2
+        /// </summary>
+        [TestMethod]
+        public void EndEdit_Throws()
+        {
+            var value = new ClVariable("value", 0);
+
+            var solver = new ClSimplexSolver();
+
+            solver.AddStay(value, ClStrength.Strong);
+
+            solver.BeginEdit(value)
+                  .SuggestValue(value, 25)
+                  .EndEdit(); // <- Exception raised here
+        }
     }
 }
