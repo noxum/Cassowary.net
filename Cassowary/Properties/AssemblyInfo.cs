@@ -18,33 +18,3 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
-
-using System.Reflection;
-
-//
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-//
-[assembly: AssemblyTitle("Cassowary")]
-[assembly: AssemblyDescription("Cassowary.net core library")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Cassowary.net")]
-[assembly: AssemblyCopyright("Copyright 2005-2007  Jo Vermeulen (jo.vermeulen@uhasselt.be)")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-
-//
-// Version information for an assembly consists of the following four values:
-//
-//      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
-//
-// You can specify all the values or you can default the Revision and Build Numbers 
-// by using the '*' as shown below:
-
-[assembly: AssemblyVersion("4.0.0")]
-
